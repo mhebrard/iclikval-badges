@@ -3,6 +3,7 @@ var fs = require('fs');
 var path = require('path');
 var sql = require('sqlite3').verbose();
 var http = require('http');
+var config = require('../config.json');
 
 //Define Database
 var file = 'rewards.db';
@@ -78,7 +79,7 @@ function selectUser(user) {
 		//select user
 		db.all("SELECT * FROM user WHERE username='"+user+"'", function(err, u) {
 			if(err) {rej(Error("server.model.selectUser.select:"+err));}
-			if(u.length==0) {// add user to reward db
+			if(!u || u.length==0) {// add user to reward db
 				console.log("INSERT",user);
 				u=[{username:user,hasnewannotation:1}];
 				db.run("INSERT INTO user VALUES (?,?)",[user,1],function(err,r) {
@@ -96,13 +97,10 @@ function computeRewards(u) {
 	var fc,fh,fk,fd;
 	if (u.hasnewannotation==1) { //update user's badges
 		//get iclikval API token
-		seq = seq.then(function(){
-			console.log("get token for iclikval API");
-			return getToken();
-		}).then(function(token) {
+		seq = seq.then(function() {
 			console.log("QUERY ANNOT of",u.username);
 			var p={"group":["reviewer","year","month","day"],"filter":{"reviewer":u.username}};
-			return query("/annotation-count",p,u.username,token); 
+			return query("/annotation-count",p,u.username,config.token); 
 		})
 		.then(function(data) {
 			return computeWeek(data.result); })
@@ -255,14 +253,14 @@ function query (entry,p,user,token) {
  	})
  }
  
-function getToken() {
+/*function getToken() {
 	return new Promise(function(ful,rej) {
 		fs.readFile(path.join(__dirname, "..","middlewares","auth.json"), function(err, data){
 			if(err) { rej(Error("server.model.getToken:"+err)); }
 			else { ful(JSON.parse(data).token);}
 		});
 	});
-}
+}*/
 
 function computeWeek(data) { //return array of days
 	return new Promise(function(ful,rej) {

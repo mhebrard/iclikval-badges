@@ -5,10 +5,11 @@ var path = require('path');
 var bodyParser = require('body-parser');
 var morgan = require('morgan');
 var model = require('./model/model.js');
+var config = require('./config.json');
 
 //init app
 var app = express();
-var port = process.env.PORT || 5555;
+var port = process.env.PORT ||  config.port;
 // create a write stream for log
 var accessLogStream = fs.createWriteStream(path.join(__dirname,'access.log'), {flags: 'a'});
 
@@ -37,14 +38,6 @@ app.get('/rewards',function(req,res) {
 	})
 })
 
-//authentification needed
-//app.all('/get*',[require('./middlewares/authentify')])
-
-/*app.get('/gettest',function(req,res) {
-	console.log('TEST');
-	res.end("I know you");
-})
-*/
 //allow CORS
 app.all('/get*',function(req,res,next) {
 	res.header("Access-Control-Allow-Origin", "*");
