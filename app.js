@@ -77,5 +77,5 @@ app.post('/getrewards',[require('./middlewares/authentify')],function(req,res){
 //listen
 app.listen(port, function() {
 	model.init();
-	console.log('Server running on',port);
+	console.log('Server v1.1 running on',port);
 })
