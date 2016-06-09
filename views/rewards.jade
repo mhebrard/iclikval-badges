@@ -1,0 +1,42 @@
+extends ./layout.jade
+
+block title
+  title #{title}
+
+block content
+  .title(style='display:flex;text-align:center;')
+      div(style='width:100px')
+        h4 Black
+      div(style='width:100px')
+        h4 Gray
+      div(style='width:100px')
+        h4 Bronze
+      div(style='width:100px')
+        h4 Silver
+      div(style='width:100px')
+        h4 Gold
+      div(style='width:100px')
+        h4 Jade
+
+  - var format = function(i) { return Number(i).toLocaleString('en'); }
+
+  - each d in data
+    .imgs
+      img(src='./img/'+d.id+'.svg')
+      img(src='./img/'+d.id+'-0.svg')
+      img(src='./img/'+d.id+'-1.svg')
+      img(src='./img/'+d.id+'-2.svg')
+      img(src='./img/'+d.id+'-3.svg')
+      img(src='./img/'+d.id+'-4.svg')
+    .tiers(style='display:flex;text-align:center;')
+      div(style='width:200px')
+        h4 #{d.title}
+      div(style='width:100px')
+        h4 #{format(d.tier1)}
+      div(style='width:100px')
+        h4 #{format(d.tier2)}
+      div(style='width:100px')
+        h4 #{format(d.tier3)}
+      div 
+        h4 #{d.legend}
+      

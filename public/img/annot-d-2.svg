@@ -1,0 +1,48 @@
+<svg version="1.1"
+xmlns="http://www.w3.org/2000/svg"
+xmlns:xlink="http://www.w3.org/1999/xlink"
+width="100px" height="100px">
+
+	<defs>
+		<filter id="bevel-shadow" x="-50%" y="-50%" width="200%" height="200%">
+			<feGaussianBlur stdDeviation="1" result="blur"/>
+			<feOffset in="blur" dx="1" dy="1" result="blur1"/>
+			<feOffset in="blur" dx="0" dy="0" result="blur2"/>
+
+			<feComposite in="blur2" in2="blur1" operator="arithmetic" k2="1" k3="-1" result="diff1"/>
+			<feFlood flood-color="black"/>
+			<feComposite in2="diff1" operator="in" result="diff1"/>
+
+			<feComposite in="blur1" in2="blur2" operator="arithmetic" k2="1" k3="-1" result="diff2"/>
+			<feFlood flood-color="white" flood-opacity="0.5"/>
+			<feComposite in2="diff2" operator="in" result="diff2"/>
+
+			<feMorphology operator="erode" radius="2" in="SourceAlpha"/>
+			<feGaussianBlur stdDeviation="2" result="blur"/>
+			<feOffset dy="3" dx="3"/>
+			<feComposite in2="SourceAlpha" operator="arithmetic" k2="-1" k3="1" result="shadowDiff"/>
+			<feFlood flood-color="black" flood-opacity=".8"/>
+			<feComposite in2="shadowDiff" operator="in" result="shadow"/>
+
+			<feMerge>
+				<feMergeNode in="SourceGraphic"/>
+				<feMergeNode in="shadow"/>
+				<feMergeNode in="diff1"/>
+				<feMergeNode in="diff2"/>
+			</feMerge>
+		</filter>
+		<path id="ring" d="M50,0 A50,50 0 1,1 50,100 A50,50 0 0,1 50,00 v10 A40,40 1 0,0 50,90 A40,40 1 1,0 50,10 Z"/>
+		<path transform="scale(1,-1) scale(0.03)" id="sun-o" unicode="&#xf185;"
+			d="M1472 640q0 117 -45.5 223.5t-123 184t-184 123t-223.5 45.5t-223.5 -45.5t-184 -123t-123 -184t-45.5 -223.5t45.5 -223.5t123 -184t184 -123t223.5 -45.5t223.5 45.5t184 123t123 184t45.5 223.5zM1748 363q-4 -15 -20 -20l-292 -96v-306q0 -16 -13 -26q-15 -10 -29 -4 l-292 94l-180 -248q-10 -13 -26 -13t-26 13l-180 248l-292 -94q-14 -6 -29 4q-13 10 -13 26v306l-292 96q-16 5 -20 20q-5 17 4 29l180 248l-180 248q-9 13 -4 29q4 15 20 20l292 96v306q0 16 13 26q15 10 29 4l292 -94l180 248q9 12 26 12t26 -12l180 -248l292 94 q14 6 29 -4q13 -10 13 -26v-306l292 -96q16 -5 20 -20q5 -16 -4 -29l-180 -248l180 -248q9 -12 4 -29z" />
+		<path transform="scale(1,-1) scale(0.03)" id="tag" unicode="&#xf02b;"
+			d="M448 1088q0 53 -37.5 90.5t-90.5 37.5t-90.5 -37.5t-37.5 -90.5t37.5 -90.5t90.5 -37.5t90.5 37.5t37.5 90.5zM1515 512q0 -53 -37 -90l-491 -492q-39 -37 -91 -37q-53 0 -90 37l-715 716q-38 37 -64.5 101t-26.5 117v416q0 52 38 90t90 38h416q53 0 117 -26.5t102 -64.5 l715 -714q37 -39 37 -91z" />
+
+	</defs>
+	<g id="annot-d-silver">
+		<circle fill="#BBC" cx="50" cy="50" r="50"/>
+		<g fill="#889">
+<use xlink:href="#ring" style="filter:url(#bevel-shadow);"/>			<use x="18" y="74" xlink:href="#sun-o" style="filter:url(#bevel-shadow);"/>
+			<use x="40" y="58" xlink:href="#tag" style="filter:url(#bevel-shadow);"/>
+		</g>
+	</g>
+</svg>
