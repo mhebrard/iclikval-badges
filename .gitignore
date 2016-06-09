@@ -2,5 +2,9 @@
 node_modules
 
 # Security
-middlewares/auth.json
-client
+config.json
+index.htm
+
+# Logs
+*.log
+*.db
