@@ -38,7 +38,9 @@
 			return Promise.all([setView(),getRewards()]);
 			//setView(); return getRewards(); 
 		})
-		.then(function(){ setBadges(); })
+		.then(function(){
+			console.log("setBadges",badges);
+		 setBadges(); })
 		.catch(function(err) { setError(err); return Error("ick.load:",err); })
 	}
 
@@ -113,7 +115,7 @@
 		//hidden div
 		//d3.select("body").selectAll(".ick-hide").data(["tip"])
 		//.enter().append("div").attr("id",function(d){return "ick-"+d;}).attr("class", "ick-hide");
-/*ok*/
+		/*ok*/
 		//main
 		var div = d3.select(".ick-content").attr("id","ick-main")
 		var nav = div.append("div").attr("class","clearfix").append("div").attr("class","ick-nav btn-group pull-right")

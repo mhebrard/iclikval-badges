@@ -14,8 +14,8 @@ var port = process.env.PORT ||  config.port;
 var accessLogStream = fs.createWriteStream(path.join(__dirname,'access.log'), {flags: 'a'});
 
 //config app
-app.set('view engine', 'jade'); 
-app.set('views', path.join(__dirname, 'views'));
+app.set('view engine', 'pug'); 
+app.set('views', path.join(__dirname, 'pug'));
 
 //use middleware
 app.use(express.static( path.join(__dirname,'public') ));
@@ -47,17 +47,12 @@ app.all('/get*',function(req,res,next) {
 
 //restricted routes
 app.post('/getbadges',[require('./middlewares/authentify')],function(req,res) {
-	console.log('REQUEST badges');
-	model.getBadges()
-	.then(function(data) {
-		console.log('SEND badges');
-		res.writeHead(200, {
-			'Content-Type': 'application/json',
-			'Access-Control-Allow-Origin': '*'
-		});
-		res.end(JSON.stringify(data));
-	}, function(err){console.log(err);
+	console.log('SEND badges');
+	res.writeHead(200, {
+		'Content-Type': 'application/json',
+		'Access-Control-Allow-Origin': '*'
 	});
+	res.end(JSON.stringify(model.badges));
 });
 
 app.post('/getrewards',[require('./middlewares/authentify')],function(req,res){
@@ -76,6 +71,5 @@ app.post('/getrewards',[require('./middlewares/authentify')],function(req,res){
 
 //listen
 app.listen(port, function() {
-	model.init();
 	console.log('Server v1.1 running on',port);
 })
