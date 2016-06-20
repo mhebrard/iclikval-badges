@@ -1,109 +1,55 @@
 //require
 var fs = require('fs');
 var path = require('path');
-var sql = require('sqlite3').verbose();
 var http = require('http');
 var config = require('../config.json');
-
-//Define Database
-var file = 'rewards.db';
-var exists = fs.existsSync(file);
-var db = new sql.Database(file);
+var badges = require('./badges.json');
 
 //iclikval server
 var url="api.iclikval.riken.jp";
-var badges;
 
-//Init db
-module.exports.init = function() {
-	//if not exist create database
-	db.serialize(function() {
-  		if(!exists) {
-  			//create table
-    		db.run("CREATE TABLE if not exists user ("
-    			+"username TEXT PRIMARY KEY NOT NULL,"
-    			+"hasnewannotation INTEGER"
-    			+")"
-    		);
-    		db.run("CREATE TABLE if not exists reward ("
-    			+"username TEXT,"
-    			+"badgeid TEXT,"
-    			+"count1 INTEGER,"
-    			+"count2 INTEGER,"
-    			+"count3 INTEGER,"
-    			+"highscore INTEGER,"
-    			+"highitem TEXT,"
-    			+"currenttier INTEGER,"
-    			+"currentcount INTEGER,"
-    			+"next INTEGER,"
-    			+"percent INTEGER,"
-    			+"PRIMARY KEY(username,badgeid),"
-    			+"FOREIGN KEY(username) REFERENCES user(username)"
-    			+")"
-    		);
-    		db.each("SELECT name FROM sqlite_master WHERE type='table'", function (err, table) {
-    			console.log("Tables created: "+ table.name);
-   			});
-
-   		}//end if not exist
-	});//end serialize
-
-//	db.close();
-}
-
-module.exports.getBadges = function() {
-	return new Promise(function(ful,rej) {
-		console.log("READ badges");
-		fs.readFile(path.join(__dirname, "badges.json"), function(err, data){
-			if(err) { rej(Error("server.model.getBadges:"+err)); }
-			else {
-				badges=JSON.parse(data);
-				ful(badges);
-			}
-		});
-	});
-}
+module.exports.badges = badges;
 
 module.exports.getRewards = function(user) {
-	return new Promise(function(ful,rej) {
-		selectUser(user)
-		.then(function(u) { return computeRewards(u); })
-		.then(function(u) { return ful(u); })
+	var rewards=[];
+	var seq = Promise.resolve()
+	.then(function(){ //query
+		console.log("QUERY ANNOT of",user);
+		var p={"group":["reviewer","year","month","day"],"filter":{"reviewer":user}};
+		return query("/annotation-count",p,user,config.token);
+	}).then(function(annots){
+		return computeRewards(annots,rewards)})
+	.then(function() { return rewards; })
+	.catch(function(err) { return Error("server.model.getRewards:"+err)})
+
+	return seq;
+/*	return new Promise(function(ful,rej) {
+		var rewards=[];
+
+		console.log("QUERY ANNOT of",user);
+		var p={"group":["reviewer","year","month","day"],"filter":{"reviewer":user}};
+		return query("/annotation-count",p,user,config.token)
+		.then(function(data) {
+
+		})
+		computeRewards(user)
+		.then(function(u) { return ful(rewards); })
 		.catch(function(err) { return Error("server.model.getRewards:"+err)})
 	})
+*/
 }
 
-function selectUser(user) {
-	return new Promise(function(ful,rej) {
-		console.log("SELECT user",user);
-		//select user
-		db.all("SELECT * FROM user WHERE username='"+user+"'", function(err, u) {
-			if(err) {rej(Error("server.model.selectUser.select:"+err));}
-			if(!u || u.length==0) {// add user to reward db
-				console.log("INSERT",user);
-				u=[{username:user,hasnewannotation:1}];
-				db.run("INSERT INTO user VALUES (?,?)",[user,1],function(err,r) {
-					if(err) {rej(Error("server.model.selectUser.insert:"+err));}
-					ful(u[0]);
-				});
-			}
-			else {ful(u[0]);}	
-		})		
-	})
-}
-
-function computeRewards(u) {
+function computeRewards(annots,rws) {
 	var seq = Promise.resolve();
 	var fc,fh,fk,fd;
-	if (u.hasnewannotation==1) { //update user's badges
-		//get iclikval API token
-		seq = seq.then(function() {
-			console.log("QUERY ANNOT of",u.username);
-			var p={"group":["reviewer","year","month","day"],"filter":{"reviewer":u.username}};
-			return query("/annotation-count",p,u.username,config.token); 
+/*		seq = seq.then(function() {
+			console.log("QUERY ANNOT of",user);
+			var p={"group":["reviewer","year","month","day"],"filter":{"reviewer":user}};
+			return query("/annotation-count",p,user,config.token); 
 		})
-		.then(function(data) {
-			return computeWeek(data.result); })
+*/
+//		.then(function(data) {
+		seq = seq.then(function() { return computeWeek(annots.result); })
 		.then(function(days) { //Compute day + group by weekend,week,month
 			fc=function(d,b,date){ //is current day ?
 				if(d.group.year==date.getFullYear() 
@@ -143,7 +89,7 @@ function computeRewards(u) {
 			}
 
 			return Promise.all([
-				computeTier(u.username,days,getBadge("annot-d"),fc,fh), //compute day
+				computeTier(rws,days,getBadge("annot-d"),fc,fh), //compute day
 				groupBy(days.filter(function(d){return d.group.weekend==1;}),fk,fd), //group by weekend
 				groupBy(days,fk,fd), //group by week
 				groupBy(days,fkm,fdm)//group by month
@@ -190,9 +136,9 @@ function computeRewards(u) {
 			}
 
 			return Promise.all([
-				computeTier(u.username,weeks[1],getBadge("annot-we"),fc,fhwe), //compute weekend
-				computeTier(u.username,weeks[2],getBadge("annot-w"),fc,fh), //compute week
-				computeTier(u.username,weeks[3],getBadge("annot-m"),fcm,fhm), //compute month
+				computeTier(rws,weeks[1],getBadge("annot-we"),fc,fhwe), //compute weekend
+				computeTier(rws,weeks[2],getBadge("annot-w"),fc,fh), //compute week
+				computeTier(rws,weeks[3],getBadge("annot-m"),fcm,fhm), //compute month
 				groupBy(weeks[3],fk,fd) //group by year
 			])
 		})
@@ -208,17 +154,10 @@ function computeRewards(u) {
 				return fdate(d.group.year);
 			}
 
-			return computeTier(u.username,years[3],getBadge("annot-y"),fc,fh);
+			return computeTier(rws,years[3],getBadge("annot-y"),fc,fh);
 		})
 		.catch(function(err) { return Error("server.model.computeRewards.years:"+err)})
-	}
 	
-	//Select Rewards
-	seq = seq.then(function(){
-		//	return {test:"STOP",func:"computeRewards",data:years};
-		return selectRewards(u.username);
-	})
-
 	return seq;
 }
 
@@ -309,7 +248,7 @@ function groupBy(data,fk,fd) {
 	})
 }
 
-function computeTier(user,data,b,fc,fh) {
+function computeTier(rws,data,b,fc,fh) {
 	return new Promise(function(ful,rej) {
 		var sum=0,nb=0,current=0,max={count:-1};//empty day
 		var tier0=[],tier1=[],tier2=[],tier3=[];
@@ -333,23 +272,20 @@ function computeTier(user,data,b,fc,fh) {
 		else if(current<b.tier3) {tier=2;next=b.tier3;}
 		else {tier=3;next=current;}
 		//insert
-		var insert = [user,b.id,tier1.length,tier2.length,tier3.length,max.count,fh(max),tier,current,next,Math.round(current*100/next)];
-		console.log("INSERT badge [",user,b.id,"... ]");
-		db.run("INSERT OR REPLACE INTO reward VALUES (?,?,?,?,?,?,?,?,?,?,?)",insert,function(err,r){
-			if(err) {rej(Error("server.model.computeTier:"+err));}
-			ful("Reward INSERTED");
+		rws.push({
+			badgeid:b.id, 
+			count1:tier1.length,
+			count2:tier2.length,
+			count3:tier3.length,
+			highscore:max.count,
+			highitem:fh(max),
+			currenttier:tier,
+			currentcount:current,
+			next:next,
+			percent:Math.round(current*100/next)
 		});
-	})
-}
-
-function selectRewards(user){
-	return new Promise(function(ful,rej) {
-		console.log("SELECT rewards of",user);
-		//select user
-		db.all("SELECT * FROM reward WHERE username='"+user+"'", function(err, r) {
-			if(err) {rej(Error("server.model.selectRewards:"+err));}
-			ful(r);
-		})		
+		//console.log("push rewards [",user,b.id,"... ]");
+		ful("Reward INSERTED");
 	})
 }
 
