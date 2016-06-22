@@ -23,32 +23,11 @@ module.exports.getRewards = function(user) {
 	.catch(function(err) { return Error("server.model.getRewards:"+err)})
 
 	return seq;
-/*	return new Promise(function(ful,rej) {
-		var rewards=[];
-
-		console.log("QUERY ANNOT of",user);
-		var p={"group":["reviewer","year","month","day"],"filter":{"reviewer":user}};
-		return query("/annotation-count",p,user,config.token)
-		.then(function(data) {
-
-		})
-		computeRewards(user)
-		.then(function(u) { return ful(rewards); })
-		.catch(function(err) { return Error("server.model.getRewards:"+err)})
-	})
-*/
 }
 
 function computeRewards(annots,rws) {
 	var seq = Promise.resolve();
 	var fc,fh,fk,fd;
-/*		seq = seq.then(function() {
-			console.log("QUERY ANNOT of",user);
-			var p={"group":["reviewer","year","month","day"],"filter":{"reviewer":user}};
-			return query("/annotation-count",p,user,config.token); 
-		})
-*/
-//		.then(function(data) {
 		seq = seq.then(function() { return computeWeek(annots.result); })
 		.then(function(days) { //Compute day + group by weekend,week,month
 			fc=function(d,b,date){ //is current day ?

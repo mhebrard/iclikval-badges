@@ -1,7 +1,6 @@
 !(function() {
 	
 	var ick = { version: "1.1" };
-	var mode = "prod";
 	var param = {};
 	var badges;
 		
@@ -33,15 +32,13 @@
 //			console.log("jQ",jQuery.fn.jquery);
 //			console.log("bootstrap",$.fn.modal.Constructor.VERSION);
 //			console.log("d3",d3.version);
-			return getBadges();
+			return Promise.all([initView(),getBadges()]);
 		}).then(function(){ 
 			return Promise.all([setView(),getRewards()]);
-			//setView(); return getRewards(); 
-		})
-		.then(function(){
+		}).then(function(){
 			console.log("setBadges",badges);
-		 setBadges(); })
-		.catch(function(err) { setError(err); return Error("ick.load:",err); })
+		 	setBadges(); 
+		}).catch(function(err) { setError(err); return Error("ick.load:",err); })
 	}
 
 	function scriptload(u) {
@@ -65,46 +62,7 @@
 		});
 	}
 
-	function getBadges() {
-		return new Promise(function(ful,rej) {
-			d3.json(param.server+"/getbadges/")
-				.header("Content-Type", "application/json")
-				.post(JSON.stringify({key:param.key,user:param.user}),function(err, data) {
-					if(err){ rej(Error("Unable to get badges:",err)) }
-					else {
-						badges=data;
-						console.log("getBadges",badges);
-						ful("Badges OK");
-					}
-				})
-		})
-	}			
-
-	function getRewards() {
-		return new Promise(function(ful,rej) {
-			d3.json(param.server+"/getrewards/")
-				.header("Content-Type", "application/json")
-				.post(JSON.stringify({key:param.key,user:param.user}),function(err, data) {
-					if(err){ rej(Error("Unable to get rewards:",err)) }
-					else {
-						console.log("getRewards",data);
-						//merge rewards and badges
-						data.forEach(function(rw) {
-							var b = getBadge(rw.badgeid);
-							//map all properties
-							Object.keys(rw).forEach(function(k){
-								b[k]=rw[k];
-							})
-							//delete dupl
-							delete b.badgeid;
-						})
-						ful("Rewards OK");
-					}
-				});
-		});
-	}
-
-	function setView() {
+	function initView() {
 		console.log("initView");
 		//style
 		d3.select("head").selectAll("#ick-css").data(["style"])
@@ -122,81 +80,21 @@
 		.style("margin","5px")
 		nav.selectAll("a").data(["Current","Medals"])
 		.enter().append("a")
-			//.append("a")
 			.attr("class","btn btn-default")
 			.attr("href",function(d){ return "#ick-tab"+d; })
-			//.attr("data-toggle","pill")
 			.text(function(d){ return d; })
 		var panes = div.append("div")
 		
 		//Current div
-		var cur = panes.append("div").attr("id","ick-tabCurrent").attr("class","panel panel-default")
-			cur.append("div").attr("class","panel-heading").text("Current Badge Collection")
-		var cont=cur.append("div").attr("class","panel-body")
-			.append("div").style("display","flex").style("flex-wrap","wrap")
-			.selectAll("div").data(badges)
-		var enter = cont.enter().append("div")
-			.attr("class",function(d){return "ick-b"+d.id;})
-			.style("text-align","center").style("padding","0px 5px")
-			.style("cursor","pointer")
-			.on("click",function(d){ $(this).tooltip('hide'); updateModal(d);})
-			.attr("data-toggle","modal").attr("data-target","#ick-info")
-			.attr("title",function(d) {return d.legend;})
-		enter.append("img").attr("class","ick-current")
-			.attr("alt",function(d){return d.id;})
-			.attr("src",function(d){return param.server+"/img/"+d.id+".svg";})
-			.attr("width","80px").attr("height","80px")
-			.style("margin","5px")
-		enter.append("div").attr("class","progress text-center")
-			.style("width","100%")
-			.append("div").attr("class","progress-bar progress-bar-info")
-			.attr("aria-valuemin",0).attr("aria-valuemax",100).attr("aria-valuenow",0)
-			.style("color","#000").style("width","0").append("span").text("0")
+		var pan = panes.append("div").attr("id","ick-tabCurrent").attr("class","panel panel-default")
+			pan.append("div").attr("class","panel-heading").text("Current Badge Collection")
+			pan.append("div").attr("class","panel-body")
 
 		//Medal div
-		var medals = panes.append("div").attr("id","ick-tabMedals").attr("class","panel panel-default")
-			medals.append("div").attr("class","panel-heading").text("Medals Earned")
-			//.append("h1").attr("class","panel-heading")
-		var cont=medals.append("div").attr("class","panel-body")
-			.append("table").attr("class","table table-striped table-hover")
-		var head = cont.append("thead").append("tr").attr()
-			head.append("th").text("Badge")
-			head.append("th").attr("colspan","3").style("text-align","center").text("Bronze")
-			head.append("th").attr("class","col-md-1")
-			head.append("th").attr("colspan","3").style("text-align","center").text("Silver")
-			head.append("th").attr("class","col-md-1")
-			head.append("th").attr("colspan","3").style("text-align","center").text("Gold")
-			head.append("th").style("text-align","right").text("Maximum Count")
-			head.append("th").style("text-align","center").text("Date of Maximum Count")
-		var body = cont.append("tbody").selectAll("tr").data(badges)
-		var enter = body.enter().append("tr")
-			.attr("class",function(d){return "ick-b"+d.id;})
-			.style("cursor","pointer")
-			.on("click",function(d){$(this).tooltip('hide'); updateModal(d);})
-			.attr("data-toggle","modal")
-			.attr("data-target","#ick-info")
-			.attr("title",function(d) {return d.legend;})
-			enter.append("td").text(function(d){return d.title;})
-			enter.append("td").append("img").attr("alt",function(d){return d.id;})
-			.attr("src",function(d){return param.server+"/img/"+d.id+"-1.svg";})
-			.attr("width","25px").attr("height","25px")
-			enter.append("td").text("x")
-			enter.append("td").attr("class","ick-nb1").style("text-align","right")
-			enter.append("td")
-			enter.append("td").append("img").attr("alt",function(d){return d.id;})
-			.attr("src",function(d){return param.server+"/img/"+d.id+"-2.svg";})
-			.attr("width","25px").attr("height","25px")
-			enter.append("td").text("x")
-			enter.append("td").attr("class","ick-nb2").style("text-align","right")
-			enter.append("td")
-			enter.append("td").append("img").attr("alt",function(d){return d.id;})
-			.attr("src",function(d){return param.server+"/img/"+d.id+"-3.svg";})
-			.attr("width","25px").attr("height","25px")
-			enter.append("td").text("x")
-			enter.append("td").attr("class","ick-nb3").style("text-align","right")
-			enter.append("td").attr("class","ick-highscore").style("text-align","right")
-			enter.append("td").attr("class","ick-highitem").style("text-align","center")	
-		
+		pan = panes.append("div").attr("id","ick-tabMedals").attr("class","panel panel-default")
+		pan.append("div").attr("class","panel-heading").text("Medals Earned")
+		pan.append("div").attr("class","panel-body")
+
 		//Modal
 		var modal = div.append("div").attr("id","ick-info")
 			.attr("class","modal fade")
@@ -253,14 +151,123 @@
 		    $($(this).attr('href'))[0].scrollIntoView();
 		    scrollBy(0, -offset);
 		});
-		
-		//active
-		//nav.select("li").classed("active",true);
-		//panes.select("div").classed("active",true);
-		//$('[data-toggle="modal"]').tooltip();
-		$(function() {
-   			$('[data-toggle="modal"]').tooltip();
+	}
+
+	function getBadges() {
+		return new Promise(function(ful,rej) {
+			d3.json(param.server+"/get/badges/")
+				.header("Content-Type", "application/json")
+				.post(JSON.stringify({key:param.key,user:param.user}),function(err, data) {
+					if(err){ rej(Error("Unable to get badges:",err)) }
+					else {
+						badges=data;
+						console.log("getBadges",badges);
+						ful("Badges OK");
+					}
+				})
+		})
+	}			
+
+	function getRewards() {
+		return new Promise(function(ful,rej) {
+			d3.json(param.server+"/get/rewards/")
+				.header("Content-Type", "application/json")
+				.post(JSON.stringify({key:param.key,user:param.user}),function(err, data) {
+					if(err){ rej(Error("Unable to get rewards:",err)) }
+					else {
+						console.log("getRewards",data);
+						//merge rewards and badges
+						data.forEach(function(rw) {
+							var b = getBadge(rw.badgeid);
+							//map all properties
+							Object.keys(rw).forEach(function(k){
+								b[k]=rw[k];
+							})
+							//delete dupl
+							delete b.badgeid;
+						})
+						ful("Rewards OK");
+					}
+				});
 		});
+	}
+
+	function setView() {
+		console.log("setView");		
+		//Current div
+		var cont = d3.select("#ick-tabCurrent").select(".panel-body")
+			.append("div").style("display","flex").style("flex-wrap","wrap")
+			.selectAll("div").data(badges)
+		var enter = cont.enter().append("div")
+			.attr("class",function(d){return "ick-b"+d.id;})
+			.style("text-align","center").style("padding","0px 5px")
+			.style("cursor","pointer")
+			.on("click",function(d){ $(this).tooltip('hide'); updateModal(d);})
+			.attr("data-toggle","modal").attr("data-target","#ick-info")
+			.attr("title",function(d) {return d.legend;})
+		enter.append("img").attr("class","ick-current")
+			.attr("alt",function(d){return d.id;})
+			.attr("src",function(d){return param.server+"/img/"+d.id+".svg";})
+			.attr("width","80px").attr("height","80px")
+			.style("margin","5px")
+		enter.append("div").attr("class","progress text-center")
+			.style("width","100%")
+			.append("div").attr("class","progress-bar progress-bar-info")
+			.attr("aria-valuemin",0).attr("aria-valuemax",100).attr("aria-valuenow",0)
+			.style("color","#000").style("width","0").append("span").text("0")
+
+		//Medal div
+		var cont = d3.select("#ick-tabMedals").select(".panel-body")
+			.append("table").attr("class","table table-striped table-hover")
+		var head = cont.append("thead").append("tr").attr()
+			head.append("th").text("Badge")
+			head.append("th").attr("colspan","3").style("text-align","center").text("Bronze")
+			head.append("th").attr("class","col-md-1")
+			head.append("th").attr("colspan","3").style("text-align","center").text("Silver")
+			head.append("th").attr("class","col-md-1")
+			head.append("th").attr("colspan","3").style("text-align","center").text("Gold")
+			head.append("th").style("text-align","right").text("Maximum Count")
+			head.append("th").style("text-align","center").text("Date of Maximum Count")
+		var body = cont.append("tbody").selectAll("tr").data(badges)
+		var enter = body.enter().append("tr")
+			.attr("class",function(d){return "ick-b"+d.id;})
+			.style("cursor","pointer")
+			.on("click",function(d){$(this).tooltip('hide'); updateModal(d);})
+			.attr("data-toggle","modal")
+			.attr("data-target","#ick-info")
+			.attr("title",function(d) {return d.legend;})
+			enter.append("td").text(function(d){return d.title;})
+			enter.append("td").append("img").attr("alt",function(d){return d.id;})
+			.attr("src",function(d){return param.server+"/img/"+d.id+"-1.svg";})
+			.attr("width","25px").attr("height","25px")
+			enter.append("td").text("x")
+			enter.append("td").attr("class","ick-nb1").style("text-align","right")
+			enter.append("td")
+			enter.append("td").append("img").attr("alt",function(d){return d.id;})
+			.attr("src",function(d){return param.server+"/img/"+d.id+"-2.svg";})
+			.attr("width","25px").attr("height","25px")
+			enter.append("td").text("x")
+			enter.append("td").attr("class","ick-nb2").style("text-align","right")
+			enter.append("td")
+			enter.append("td").append("img").attr("alt",function(d){return d.id;})
+			.attr("src",function(d){return param.server+"/img/"+d.id+"-3.svg";})
+			.attr("width","25px").attr("height","25px")
+			enter.append("td").text("x")
+			enter.append("td").attr("class","ick-nb3").style("text-align","right")
+			enter.append("td").attr("class","ick-highscore").style("text-align","right")
+			enter.append("td").attr("class","ick-highitem").style("text-align","center")	
+		
+		
+		//modif scroll according to iclikval top menu
+		/*var offset = 50;
+		$('.ick-nav a').click(function(event) {
+		    event.preventDefault();
+		    $($(this).attr('href'))[0].scrollIntoView();
+		    scrollBy(0, -offset);
+		});*/
+		
+		$(function() { $('[data-toggle="modal"]').tooltip(); });
+		
 		return Promise.resolve();
 	}
 
