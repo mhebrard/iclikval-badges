@@ -133,7 +133,10 @@ function computeRewards(annots,rws) {
 				return fdate(d.group.year);
 			}
 
-			return computeTier(rws,years[3],getBadge("annot-y"),fc,fh);
+			return Promise.all([
+				computeTier(rws,years[3],getBadge("annot-y"),fc,fh), //compute years
+				computeStone(rws,years[3],getBadge("annot-a")) //compute all
+			])
 		})
 		.catch(function(err) { return Error("server.model.computeRewards.years:"+err)})
 	
@@ -263,6 +266,41 @@ function computeTier(rws,data,b,fc,fh) {
 			next:next,
 			percent:Math.round(current*100/next)
 		});
+		console.log("push reward",b.id);
+		ful("Reward INSERTED");
+	})
+}
+
+function computeStone(rws,data,b) {
+	return new Promise(function(ful,rej) {
+		var sum=data.reduce(function(tot,d) {
+			return tot+d.count;
+		},0)
+		//current tier
+		var tier,next;
+		var found=false;
+		for(var i=0;i<b.tier.length && !found;i++){
+			if(sum<b.tier[i]) {
+				tier=i;
+				next=b.tier[i];
+				found=true;
+			}
+		}
+		//maximum tier
+		if(!found) {tier=b.tier.length;next=sum;}
+
+		//insert
+		rws.push({
+			badgeid:b.id, 
+			count:[],
+			highscore:0,
+			highitem:"",
+			currenttier:tier,
+			currentcount:sum,
+			next:next,
+			percent:Math.round(sum*100/next)
+		});
+		console.log("push reward",b.id);
 		ful("Reward INSERTED");
 	})
 }
