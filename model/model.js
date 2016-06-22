@@ -238,24 +238,24 @@ function computeTier(rws,data,b,fc,fh) {
 			sum+=d.count;
 			nb+=1;
 			if(d.count>max.count) {max=d;}
-			if(d.count<b.tier1) {tier0.push(d);}
-			else if(d.count<b.tier2) {tier1.push(d);}
-			else if(d.count<b.tier3) {tier2.push(d);}
+			if(d.count<b.tier[0]) {tier0.push(d);}
+			else if(d.count<b.tier[1]) {tier1.push(d);}
+			else if(d.count<b.tier[2]) {tier2.push(d);}
 			else {tier3.push(d);}
 			current+=fc(d,b,date);
 		})
 		//current tier
 		var tier,next;
-		if(current<b.tier1) {tier=0;next=b.tier1;}
-		else if(current<b.tier2) {tier=1;next=b.tier2;}
-		else if(current<b.tier3) {tier=2;next=b.tier3;}
+		if(current<b.tier[0]) {tier=0;next=b.tier[0];}
+		else if(current<b.tier[1]) {tier=1;next=b.tier[1];}
+		else if(current<b.tier[2]) {tier=2;next=b.tier[2];}
 		else {tier=3;next=current;}
 		//insert
 		rws.push({
 			badgeid:b.id, 
-			count1:tier1.length,
-			count2:tier2.length,
-			count3:tier3.length,
+			count:[tier0.length,tier1.length,tier2.length,tier3.length],
+			//count2:tier2.length,
+			//count3:tier3.length,
 			highscore:max.count,
 			highitem:fh(max),
 			currenttier:tier,
@@ -263,7 +263,6 @@ function computeTier(rws,data,b,fc,fh) {
 			next:next,
 			percent:Math.round(current*100/next)
 		});
-		//console.log("push rewards [",user,b.id,"... ]");
 		ful("Reward INSERTED");
 	})
 }

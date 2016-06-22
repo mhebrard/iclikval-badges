@@ -1,12 +1,12 @@
 [
 	{"title":"Daily Annotator","id":"annot-d","legend":"Number of annotations added in a single day",
-		"tier1":20,"tier2":60,"tier3":100},
+		"tier":[20,60,100]},
 	{"title":"Annotator at Home","id":"annot-we","legend":"Number of annotations added in a single weekend",
-		"tier1":30,"tier2":90,"tier3":150},
+		"tier":[30,90,150]},
 	{"title":"Weekly Annotator","id":"annot-w","legend":"Number of annotations added in a single week",
-		"tier1":80,"tier2":240,"tier3":400},	
+		"tier":[80,240,400]},	
 	{"title":"Monthly Annotator","id":"annot-m","legend":"Number of annotations added in a single month",
-		"tier1":300,"tier2":900,"tier3":1500},	
+		"tier":[300,900,1500]},	
 	{"title":"Yearly Annotator","id":"annot-y","legend":"Number of annotations added in a single year",
-		"tier1":4000,"tier2":12000,"tier3":20000}
+		"tier":[4000,12000,20000]}
 ]
