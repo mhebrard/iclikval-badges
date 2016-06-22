@@ -24,6 +24,7 @@ app.use(bodyParser.json())
 app.use(morgan('combined', {stream: accessLogStream})) //setup the logger
 
 //define routes
+
 //Open access routes
 app.get('/',function(req,res) {
 	console.log('HOME');
@@ -31,43 +32,14 @@ app.get('/',function(req,res) {
 	res.end('Node server Hello World\n');
 });
 
+app.use('/get', require('./routes/get.js'));
+
+/*
 app.get('/rewards',function(req,res) {
 	console.log('REWARDS')
-	model.getBadges().then(function(data) {
-		res.render('rewards',{title:"Rewards list",data:data})
-	})
+	res.render('rewards',{title:"Rewards list",data:model.badges})
 })
-
-//allow CORS
-app.all('/get*',function(req,res,next) {
-	res.header("Access-Control-Allow-Origin", "*");
-    res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
-	next();
-});
-
-//restricted routes
-app.post('/getbadges',[require('./middlewares/authentify')],function(req,res) {
-	console.log('SEND badges');
-	res.writeHead(200, {
-		'Content-Type': 'application/json',
-		'Access-Control-Allow-Origin': '*'
-	});
-	res.end(JSON.stringify(model.badges));
-});
-
-app.post('/getrewards',[require('./middlewares/authentify')],function(req,res){
-	console.log('REQUEST rewards of',req.body.user);
-	model.getRewards(req.body.user)
-	.then(function(data) {
-		console.log('SEND rewards');
-		res.writeHead(200, {
-			'Content-Type': 'application/json',
-			'Access-Control-Allow-Origin': '*'
-		});
-		res.end(JSON.stringify(data));
-	}, function(err){console.log(err);
-	});
-});
+*/
 
 //listen
 app.listen(port, function() {
