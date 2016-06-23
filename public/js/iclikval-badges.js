@@ -28,10 +28,10 @@
 		.then(function(){ return Promise.all(scripts);}) //run loading
 		.catch(function(err){return console.log("ERR(ick.load.a):"+err);})
 		.then(function(){ 
-//			console.log("iclikval",ick.version);
-//			console.log("jQ",jQuery.fn.jquery);
-//			console.log("bootstrap",$.fn.modal.Constructor.VERSION);
-//			console.log("d3",d3.version);
+			//console.log("iclikval",ick.version);
+			//console.log("jQ",jQuery.fn.jquery);
+			//console.log("bootstrap",$.fn.modal.Constructor.VERSION);
+			//console.log("d3",d3.version);
 			return Promise.all([initView(),getBadges(),getSvg()]);
 		}).then(function(){ 
 			return Promise.all([setView(),getRewards()]);
@@ -79,7 +79,7 @@
 		var div = d3.select(".ick-content").attr("id","ick-main")
 		var nav = div.append("div").attr("class","clearfix").append("div").attr("class","ick-nav btn-group pull-right")
 		.style("margin","5px")
-		nav.selectAll("a").data(["Current","Medals"])
+		nav.selectAll("a").data(["Current","Medals","Milestones"])
 		.enter().append("a")
 			.attr("class","btn btn-default")
 			.attr("href",function(d){ return "#ick-tab"+d; })
@@ -91,9 +91,14 @@
 			pan.append("div").attr("class","panel-heading").text("Current Badge Collection")
 			pan.append("div").attr("class","panel-body")
 
-		//Medal div
+		//Medals div
 		pan = panes.append("div").attr("id","ick-tabMedals").attr("class","panel panel-default")
 		pan.append("div").attr("class","panel-heading").text("Medals Earned")
+		pan.append("div").attr("class","panel-body")
+
+		//Milestones div
+		pan = panes.append("div").attr("id","ick-tabMilestones").attr("class","panel panel-default")
+		pan.append("div").attr("class","panel-heading").text("Milestones Earned")
 		pan.append("div").attr("class","panel-body")
 
 		//Modal
@@ -119,6 +124,7 @@
 		var line = sub.append("div")
 		line.append("label").html("Badges Earned:&nbsp;")
 		line.append("span").attr("class","ick-earned")
+
 		line = sub.append("div")
 		line.append("label").html("Maximum Count:&nbsp")
 		line.append("span").attr("class","ick-highscore")
@@ -234,12 +240,8 @@
 		var cont = d3.select("#ick-tabMedals").select(".panel-body")
 			.append("table").attr("class","table table-striped table-hover")
 		var head = cont.append("thead").append("tr").attr()
-			head.append("th").text("Badge")
-			head.append("th").attr("colspan","3").style("text-align","center").text("Bronze")
-			head.append("th").attr("class","col-md-1")
-			head.append("th").attr("colspan","3").style("text-align","center").text("Silver")
-			head.append("th").attr("class","col-md-1")
-			head.append("th").attr("colspan","3").style("text-align","center").text("Gold")
+			head.append("th").text("Badge Name")
+			head.append("th").text("Medals Earned")
 			head.append("th").style("text-align","right").text("Maximum Count")
 			head.append("th").style("text-align","center").text("Date of Maximum Count")
 		var body = cont.append("tbody").selectAll("tr")
@@ -252,36 +254,32 @@
 			.attr("data-target","#ick-info")
 			.attr("title",function(d) {return d.legend;})
 			enter.append("td").text(function(d){return d.title;})
-			enter.append("td").append("svg").attr("class","ick-b")
-			.attr("width","25px").attr("height","25px")
-			.append("use").attr("xlink:href",function(d){return "#"+d.id})
-			enter.append("td").text("x")
-			enter.append("td").attr("class","ick-nb1").style("text-align","right")
-			enter.append("td")
-			enter.append("td").append("svg").attr("class","ick-s")
-			.attr("width","25px").attr("height","25px")
-			.append("use").attr("xlink:href",function(d){return "#"+d.id})
-			
-			enter.append("td").text("x")
-			enter.append("td").attr("class","ick-nb2").style("text-align","right")
-			enter.append("td")
-			enter.append("td").append("svg").attr("class","ick-g")
-			.attr("width","25px").attr("height","25px")
-			.append("use").attr("xlink:href",function(d){return "#"+d.id})
-			enter.append("td").text("x")
-			enter.append("td").attr("class","ick-nb3").style("text-align","right")
+			enter.append("td").attr("class","ick-earned")
 			enter.append("td").attr("class","ick-highscore").style("text-align","right")
 			enter.append("td").attr("class","ick-highitem").style("text-align","center")	
 		
-		
-		//modif scroll according to iclikval top menu
-		/*var offset = 50;
-		$('.ick-nav a').click(function(event) {
-		    event.preventDefault();
-		    $($(this).attr('href'))[0].scrollIntoView();
-		    scrollBy(0, -offset);
-		});*/
-		
+		//Milestones div
+		var cont = d3.select("#ick-tabMilestones").select(".panel-body")
+			.append("table").attr("class","table table-striped table-hover")
+		var head = cont.append("thead").append("tr").attr()
+			head.append("th").text("Badge Name")
+			head.append("th").text("Milestones Earned")
+			head.append("th").style("text-align","right").text("Maximum Count")
+			head.append("th").style("text-align","right").text("Next Stone")
+		var body = cont.append("tbody").selectAll("tr")
+			.data(badges.filter(function(d){return d.tier.length>3;}))
+		var enter = body.enter().append("tr")
+			.attr("class",function(d){return "ick-b"+d.id;})
+			.style("cursor","pointer")
+			.on("click",function(d){$(this).tooltip('hide'); updateModal(d);})
+			.attr("data-toggle","modal")
+			.attr("data-target","#ick-info")
+			.attr("title",function(d) {return d.legend;})
+			enter.append("td").text(function(d){return d.title;})
+			enter.append("td").attr("class","ick-earned")
+			enter.append("td").attr("class","ick-highscore").style("text-align","right")
+			enter.append("td").attr("class","ick-next").style("text-align","right")
+
 		$(function() { $('[data-toggle="modal"]').tooltip(); });
 		
 		return Promise.resolve();
@@ -291,7 +289,25 @@
 		var div = d3.select("#ick-info").datum(d);
 		div.select(".modal-title").text(d.title)
 		div.select(".ick-legend").text(d.legend)
-		//Earned
+		updateEarned(div,d);
+		div.selectAll(".ick-highscore").text(f(d.highscore))
+		div.select(".ick-highitem").text(d.highitem)
+		div.select("span.ick-current").text(f(d.currentcount))
+		div.select("svg.ick-current").attr("class", function() {
+			var t=d.currenttier;
+			while(t>10){t-=10;}
+			return "ick-current ick-"+t;
+		})
+		div.select(".progress-bar").style("width",d.percent+"%")
+			.attr("aria-valuemax",d.next).attr("aria-valuenow",f(d.currentcount))
+			.select("span").text(f(d.currentcount))
+		div.select(".ick-next").html(function(){return d.currentcount==d.next ? "-" : f(d.next)})
+		//shape
+		div.selectAll("svg").selectAll("use").attr("xlink:href","#"+d.id)
+	}
+
+	function updateEarned(div,d) {
+		console.log("uE",div,d);
 		var line=div.select(".ick-earned").html("");
 		if(d.tier.length==3) {//medal
 			line.append("svg").attr("class","ick-b")
@@ -322,19 +338,7 @@
 				.append("use")
 			}
 			
-		}		
-		div.selectAll(".ick-highscore").text(f(d.highscore))
-		div.select(".ick-highitem").text(d.highitem)
-		div.select("span.ick-current").text(f(d.currentcount))
-		div.select("svg.ick-current").attr("class", function() {
-			var t=d.currenttier;
-			while(t>10){t-=10;}
-			return "ick-current ick-"+t;
-		})
-		div.select(".progress-bar").style("width",d.percent+"%")
-			.attr("aria-valuemax",d.next).attr("aria-valuenow",f(d.currentcount))
-			.select("span").text(f(d.currentcount))
-		div.select(".ick-next").html(function(){return d.currentcount==d.next ? "-" : f(d.next)})
+		}
 		//shape
 		div.selectAll("svg").selectAll("use").attr("xlink:href","#"+d.id)
 	}
@@ -360,16 +364,17 @@
 			.attr("aria-valuemax",function(d){ return d.next;})
 			.attr("aria-valuenow",function(d){ return d.currentcount;})
 			.selectAll("span").text(function(d){ return f(d.currentcount);})
-		d3.selectAll(".ick-nb1").filter(function(d){return d && d.next;})
-			.text(function(d) {return d.count[1];})
-		d3.selectAll(".ick-nb2").filter(function(d){return d && d.next;})
-			.text(function(d) {return d.count[2];})
-		d3.selectAll(".ick-nb3").filter(function(d){return d && d.next;})
-			.text(function(d) {return d.count[3];})
+
+		//Earned
+		d3.selectAll("tr").filter(function(d){return d && d.next;})
+		.each(function(d) { updateEarned(d3.select(this),d); })
+		
 		d3.selectAll(".ick-highscore").filter(function(d){return d && d.next;})
 			.text(function(d) {return f(d.highscore);})
 		d3.selectAll(".ick-highitem").filter(function(d){return d && d.next;})
 			.text(function(d) {return d.highitem;})
+		d3.selectAll(".ick-next").filter(function(d){return d && d.next;})
+			.html(function(d){return d.currentcount==d.next ? "-" : f(d.next)})
 	}
 	
 	function setError(e) {
@@ -378,11 +383,6 @@
 		div.append("span").attr("class","glyphicon glyphicon-exclamation-sign")
 		div.append("span").text("Error: Cannot get data");
 		console.log(e);
-			/*<div class="alert alert-danger" role="alert">
-  <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
-  <span class="sr-only">Error:</span>
-  Enter a valid email address
-</div>*/
 	}
 
 	function f(i) { return Number(i).toLocaleString('en'); }
