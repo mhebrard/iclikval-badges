@@ -1,4 +1,5 @@
 var express = require('express');
+var path = require('path');
 var router = express.Router();
 var model = require('../model/model.js');
 
@@ -6,6 +7,17 @@ router.use(function(req, res, next) {
   res.header("Access-Control-Allow-Origin", "*");
   res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
   next();
+});
+
+router.post('/glyphs',[require('../middlewares/authentify')],function(req,res) {
+	console.log('SEND glyphs');
+	//res.writeHead(200, {
+	//	'Content-Type': 'application/json',
+	//	'Access-Control-Allow-Origin': '*'
+	//});
+	
+	//console.log(path.join(__dirname,'..','public','img','glyphs.svg'));
+	res.sendFile(path.join(__dirname,'..','public','img','glyphs.svg'));
 });
 
 router.post('/badges',[require('../middlewares/authentify')],function(req,res) {

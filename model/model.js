@@ -250,9 +250,9 @@ function computeTier(rws,data,b,fc,fh) {
 		//current tier
 		var tier,next;
 		if(current<b.tier[0]) {tier=0;next=b.tier[0];}
-		else if(current<b.tier[1]) {tier=1;next=b.tier[1];}
-		else if(current<b.tier[2]) {tier=2;next=b.tier[2];}
-		else {tier=3;next=current;}
+		else if(current<b.tier[1]) {tier='b';next=b.tier[1];}
+		else if(current<b.tier[2]) {tier='s';next=b.tier[2];}
+		else {tier='g';next=current;}
 		//insert
 		rws.push({
 			badgeid:b.id, 
@@ -288,13 +288,14 @@ function computeStone(rws,data,b) {
 		}
 		//maximum tier
 		if(!found) {tier=b.tier.length;next=sum;}
+		var today = new Date();
 
 		//insert
 		rws.push({
 			badgeid:b.id, 
 			count:[],
-			highscore:0,
-			highitem:"",
+			highscore:sum,
+			highitem:fdate(today.getFullYear(),today.getMonth()+1,today.getDate()),
 			currenttier:tier,
 			currentcount:sum,
 			next:next,
