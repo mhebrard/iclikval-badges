@@ -241,7 +241,7 @@
 			.append("table").attr("class","table table-striped table-hover")
 		var head = cont.append("thead").append("tr").attr()
 			head.append("th").text("Badge Name")
-			head.append("th").text("Medals Earned")
+			head.append("th").style("text-align","center").text("Medals Earned")
 			head.append("th").style("text-align","right").text("Maximum Count")
 			head.append("th").style("text-align","center").text("Date of Maximum Count")
 		var body = cont.append("tbody").selectAll("tr")
@@ -254,7 +254,7 @@
 			.attr("data-target","#ick-info")
 			.attr("title",function(d) {return d.legend;})
 			enter.append("td").text(function(d){return d.title;})
-			enter.append("td").attr("class","ick-earned")
+			enter.append("td").attr("class","ick-earned").style("display","flex")
 			enter.append("td").attr("class","ick-highscore").style("text-align","right")
 			enter.append("td").attr("class","ick-highitem").style("text-align","center")	
 		
@@ -310,18 +310,26 @@
 		console.log("uE",div,d);
 		var line=div.select(".ick-earned").html("");
 		if(d.tier.length==3) {//medal
-			line.append("svg").attr("class","ick-b")
+			line.append("span").style("flex-grow",1)
+				.style("text-align","right").style("font-weight","bold")
+				.html("&nbsp;"+d.count[1]+"x"+"&nbsp;")
+			line.append("svg").attr("class","ick-b").style("flex-grow",0)
 				.attr("width","25px").attr("height","25px")
 				.append("use")
-			line.append("span").html("x"+d.count[1]+"&nbsp;")
-			line.append("svg").attr("class","ick-s")
+			
+			line.append("span").style("flex-grow",1)
+				.style("text-align","right").style("font-weight","bold")
+				.html("&nbsp;"+d.count[2]+"x"+"&nbsp;")
+			line.append("svg").attr("class","ick-s").style("flex-grow",0)
 				.attr("width","25px").attr("height","25px")
 				.append("use")
-			line.append("span").html("x"+d.count[2]+"&nbsp;")
-			line.append("svg").attr("class","ick-g")
+
+			line.append("span").style("flex-grow",1)
+				.style("text-align","right").style("font-weight","bold")
+				.html("&nbsp;"+d.count[3]+"x"+"&nbsp;")
+			line.append("svg").attr("class","ick-g").style("flex-grow",0)
 				.attr("width","25px").attr("height","25px")
 				.append("use")
-			line.append("span").html("x"+d.count[3]+"&nbsp;")
 		}
 		else {//milestone
 			var t=d.currenttier;
@@ -331,7 +339,7 @@
 				.append("use")
 				t-=10;
 			}
-			line.append("span").html("&nbsp;+&nbsp;")
+			//line.append("span").html("&nbsp;+&nbsp;")
 			for(i=1;i<=t;i++){
 				line.append("svg").attr("class","ick-"+i)
 				.attr("width","25px").attr("height","25px")
