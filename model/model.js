@@ -38,9 +38,9 @@ function computeRewards(annots,rws) {
 				}
 				else {return 0;}
 			}
-			fh=function(d) { //high day display
+			/*fh=function(d) { //high day display
 				return fdate(d.group.year,d.group.month,d.group.day);
-			}
+			}*/
 			fk=function(d) { //key for week
 				return d.group.year+"-"+d.group.week;
 			} 
@@ -68,7 +68,7 @@ function computeRewards(annots,rws) {
 			}
 
 			return Promise.all([
-				computeTier(rws,days,getBadge("annot-d"),fc,fh), //compute day
+				computeTier(rws,days,"annot-d",fc), //compute day
 				groupBy(days.filter(function(d){return d.group.weekend==1;}),fk,fd), //group by weekend
 				groupBy(days,fk,fd), //group by week
 				groupBy(days,fkm,fdm)//group by month
@@ -83,18 +83,18 @@ function computeRewards(annots,rws) {
 				}
 				else {return 0;}
 			}
-			fh=function(d) { //high week display
+			/*fh=function(d) { //high week display
 				var date = new Date(d.group.year,d.group.month-1,d.group.day);
 				var mon = new Date(d.group.year,d.group.month-1,d.group.day);
 				var sun = new Date(date.setTime( date.getTime() + 6 * 86400000 ));
 				return fdate(mon.getFullYear(),mon.getMonth()+1,mon.getDate())+" to "+fdate(sun.getFullYear(),sun.getMonth()+1,sun.getDate())
-			}
-			var fhwe=function(d) { //high weekend display
+			}*/
+			/*var fhwe=function(d) { //high weekend display
 				var date = new Date(d.group.year,d.group.month-1,d.group.day);
 				var sat = new Date(date.setTime( date.getTime() + 5 * 86400000 ));
 				var sun = new Date(date.setTime( date.getTime() + 1 * 86400000 ));
 				return fdate(sat.getFullYear(),sat.getMonth()+1,sat.getDate())+" to "+fdate(sun.getFullYear(),sun.getMonth()+1,sun.getDate())
-			}
+			}*/
 			var fcm=function(d,b,date){ //current month
 				if(d.group.year==date.getFullYear() 
 					&& d.group.month==date.getMonth()+1) {
@@ -102,9 +102,9 @@ function computeRewards(annots,rws) {
 				}
 				else {return 0;}
 			}
-			var fhm=function(d) { //high month display
+			/*var fhm=function(d) { //high month display
 				return fdate(d.group.year,d.group.month);
-			}
+			}*/
 			fk=function(d) { //key for year
 				return d.group.year;
 			}
@@ -115,9 +115,9 @@ function computeRewards(annots,rws) {
 			}
 
 			return Promise.all([
-				computeTier(rws,weeks[1],getBadge("annot-we"),fc,fhwe), //compute weekend
-				computeTier(rws,weeks[2],getBadge("annot-w"),fc,fh), //compute week
-				computeTier(rws,weeks[3],getBadge("annot-m"),fcm,fhm), //compute month
+				computeTier(rws,weeks[1],"annot-we",fc), //compute weekend
+				computeTier(rws,weeks[2],"annot-w",fc), //compute week
+				computeTier(rws,weeks[3],"annot-m",fcm), //compute month
 				groupBy(weeks[3],fk,fd) //group by year
 			])
 		})
@@ -129,13 +129,13 @@ function computeRewards(annots,rws) {
 				}
 				else {return 0;}
 			}
-			fh = function(d) { //high year display
+			/*fh = function(d) { //high year display
 				return fdate(d.group.year);
-			}
+			}*/
 
 			return Promise.all([
-				computeTier(rws,years[3],getBadge("annot-y"),fc,fh), //compute years
-				computeStone(rws,years[3],getBadge("annot-a")) //compute all
+				computeTier(rws,years[3],"annot-y",fc), //compute years
+				computeStone(rws,years[3],"annot-a") //compute all
 			])
 		})
 		.catch(function(err) { return Error("server.model.computeRewards.years:"+err)})
@@ -230,16 +230,15 @@ function groupBy(data,fk,fd) {
 	})
 }
 
-function computeTier(rws,data,b,fc,fh) {
+function computeTier(rws,data,id,fc) {
 	return new Promise(function(ful,rej) {
-		var sum=0,nb=0,current=0,max={count:-1};//empty day
+		var b = getBadge(id);
+		var current=0,max={count:-1};//empty day
 		var tier0=[],tier1=[],tier2=[],tier3=[];
 		var date=new Date();
 
 		//split by tier + sum + max + currentcount
 		data.forEach(function(d){
-			sum+=d.count;
-			nb+=1;
 			if(d.count>max.count) {max=d;}
 			if(d.count<b.tier[0]) {tier0.push(d);}
 			else if(d.count<b.tier[1]) {tier1.push(d);}
@@ -259,8 +258,8 @@ function computeTier(rws,data,b,fc,fh) {
 			count:[tier0.length,tier1.length,tier2.length,tier3.length],
 			//count2:tier2.length,
 			//count3:tier3.length,
-			highscore:max.count,
-			highitem:fh(max),
+			//highscore:max.count,
+			//highitem:fh(max),
 			currenttier:tier,
 			currentcount:current,
 			next:next,
@@ -271,8 +270,9 @@ function computeTier(rws,data,b,fc,fh) {
 	})
 }
 
-function computeStone(rws,data,b) {
+function computeStone(rws,data,id) {
 	return new Promise(function(ful,rej) {
+		var b = getBadge(id+"s");
 		var sum=data.reduce(function(tot,d) {
 			return tot+d.count;
 		},0)
@@ -294,8 +294,8 @@ function computeStone(rws,data,b) {
 		rws.push({
 			badgeid:b.id, 
 			count:[],
-			highscore:sum,
-			highitem:fdate(today.getFullYear(),today.getMonth()+1,today.getDate()),
+			//highscore:sum,
+			//highitem:fdate(today.getFullYear(),today.getMonth()+1,today.getDate()),
 			currenttier:tier,
 			currentcount:sum,
 			next:next,

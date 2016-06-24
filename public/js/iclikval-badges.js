@@ -242,8 +242,8 @@
 		var head = cont.append("thead").append("tr").attr()
 			head.append("th").text("Badge Name")
 			head.append("th").style("text-align","center").text("Medals Earned")
-			head.append("th").style("text-align","right").text("Maximum Count")
-			head.append("th").style("text-align","center").text("Date of Maximum Count")
+			head.append("th").style("text-align","right").text("Current Count")
+			head.append("th").style("text-align","right").text("Next Medal")
 		var body = cont.append("tbody").selectAll("tr")
 			.data(badges.filter(function(d){return d.tier.length==3;}))
 		var enter = body.enter().append("tr")
@@ -255,8 +255,8 @@
 			.attr("title",function(d) {return d.legend;})
 			enter.append("td").text(function(d){return d.title;})
 			enter.append("td").attr("class","ick-earned").style("display","flex")
-			enter.append("td").attr("class","ick-highscore").style("text-align","right")
-			enter.append("td").attr("class","ick-highitem").style("text-align","center")	
+			enter.append("td").attr("class","ick-current").style("text-align","right")
+			enter.append("td").attr("class","ick-next").style("text-align","right")	
 		
 		//Milestones div
 		var cont = d3.select("#ick-tabMilestones").select(".panel-body")
@@ -264,7 +264,7 @@
 		var head = cont.append("thead").append("tr").attr()
 			head.append("th").text("Badge Name")
 			head.append("th").text("Milestones Earned")
-			head.append("th").style("text-align","right").text("Maximum Count")
+			head.append("th").style("text-align","right").text("Current Count")
 			head.append("th").style("text-align","right").text("Next Stone")
 		var body = cont.append("tbody").selectAll("tr")
 			.data(badges.filter(function(d){return d.tier.length>3;}))
@@ -277,7 +277,7 @@
 			.attr("title",function(d) {return d.legend;})
 			enter.append("td").text(function(d){return d.title;})
 			enter.append("td").attr("class","ick-earned")
-			enter.append("td").attr("class","ick-highscore").style("text-align","right")
+			enter.append("td").attr("class","ick-current").style("text-align","right")
 			enter.append("td").attr("class","ick-next").style("text-align","right")
 
 		$(function() { $('[data-toggle="modal"]').tooltip(); });
@@ -307,7 +307,7 @@
 	}
 
 	function updateEarned(div,d) {
-		console.log("uE",div,d);
+		//console.log("uE",div,d);
 		var line=div.select(".ick-earned").html("");
 		if(d.tier.length==3) {//medal
 			line.append("span").style("flex-grow",1)
@@ -334,9 +334,14 @@
 		else {//milestone
 			var t=d.currenttier;
 			while(t>10){
-				line.append("svg").attr("class","ick-11")
-				.attr("width","25px").attr("height","25px")
-				.append("use")
+				var stack=line.append("svg")
+				.attr("width","50px").attr("height","25px");
+				for(i=1;i<=10;i++){
+					stack.append("svg").attr("class","ick-"+i)
+					.attr("width","25px").attr("height","25px")
+					.attr("transform","translate("+(2*i)+",0)")
+					.append("use")
+				}
 				t-=10;
 			}
 			//line.append("span").html("&nbsp;+&nbsp;")
@@ -377,10 +382,12 @@
 		d3.selectAll("tr").filter(function(d){return d && d.next;})
 		.each(function(d) { updateEarned(d3.select(this),d); })
 		
-		d3.selectAll(".ick-highscore").filter(function(d){return d && d.next;})
-			.text(function(d) {return f(d.highscore);})
-		d3.selectAll(".ick-highitem").filter(function(d){return d && d.next;})
-			.text(function(d) {return d.highitem;})
+		//d3.selectAll(".ick-highscore").filter(function(d){return d && d.next;})
+		//	.text(function(d) {return f(d.highscore);})
+		//d3.selectAll(".ick-highitem").filter(function(d){return d && d.next;})
+		//	.text(function(d) {return d.highitem;})
+		d3.selectAll("td.ick-current").filter(function(d){return d && d.next;})
+			.text(function(d){return f(d.currentcount);})
 		d3.selectAll(".ick-next").filter(function(d){return d && d.next;})
 			.html(function(d){return d.currentcount==d.next ? "-" : f(d.next)})
 	}
