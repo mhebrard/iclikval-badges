@@ -38,9 +38,6 @@ function computeRewards(annots,rws) {
 				}
 				else {return 0;}
 			}
-			fh=function(d) { //high day display
-				return fdate(d.group.year,d.group.month,d.group.day);
-			}
 			fk=function(d) { //key for week
 				return d.group.year+"-"+d.group.week;
 			} 
@@ -68,7 +65,7 @@ function computeRewards(annots,rws) {
 			}
 
 			return Promise.all([
-				computeTier(rws,days,getBadge("annot-d"),fc,fh), //compute day
+				computeTier(rws,days,"annot-d",fc), //compute day
 				groupBy(days.filter(function(d){return d.group.weekend==1;}),fk,fd), //group by weekend
 				groupBy(days,fk,fd), //group by week
 				groupBy(days,fkm,fdm)//group by month
@@ -83,27 +80,12 @@ function computeRewards(annots,rws) {
 				}
 				else {return 0;}
 			}
-			fh=function(d) { //high week display
-				var date = new Date(d.group.year,d.group.month-1,d.group.day);
-				var mon = new Date(d.group.year,d.group.month-1,d.group.day);
-				var sun = new Date(date.setTime( date.getTime() + 6 * 86400000 ));
-				return fdate(mon.getFullYear(),mon.getMonth()+1,mon.getDate())+" to "+fdate(sun.getFullYear(),sun.getMonth()+1,sun.getDate())
-			}
-			var fhwe=function(d) { //high weekend display
-				var date = new Date(d.group.year,d.group.month-1,d.group.day);
-				var sat = new Date(date.setTime( date.getTime() + 5 * 86400000 ));
-				var sun = new Date(date.setTime( date.getTime() + 1 * 86400000 ));
-				return fdate(sat.getFullYear(),sat.getMonth()+1,sat.getDate())+" to "+fdate(sun.getFullYear(),sun.getMonth()+1,sun.getDate())
-			}
 			var fcm=function(d,b,date){ //current month
 				if(d.group.year==date.getFullYear() 
 					&& d.group.month==date.getMonth()+1) {
 					return d.count;
 				}
 				else {return 0;}
-			}
-			var fhm=function(d) { //high month display
-				return fdate(d.group.year,d.group.month);
 			}
 			fk=function(d) { //key for year
 				return d.group.year;
@@ -115,9 +97,9 @@ function computeRewards(annots,rws) {
 			}
 
 			return Promise.all([
-				computeTier(rws,weeks[1],getBadge("annot-we"),fc,fhwe), //compute weekend
-				computeTier(rws,weeks[2],getBadge("annot-w"),fc,fh), //compute week
-				computeTier(rws,weeks[3],getBadge("annot-m"),fcm,fhm), //compute month
+				computeTier(rws,weeks[1],"annot-we",fc), //compute weekend
+				computeTier(rws,weeks[2],"annot-w",fc), //compute week
+				computeTier(rws,weeks[3],"annot-m",fcm), //compute month
 				groupBy(weeks[3],fk,fd) //group by year
 			])
 		})
@@ -129,11 +111,13 @@ function computeRewards(annots,rws) {
 				}
 				else {return 0;}
 			}
-			fh = function(d) { //high year display
-				return fdate(d.group.year);
-			}
 
-			return computeTier(rws,years[3],getBadge("annot-y"),fc,fh);
+			var sum=years[3].reduce(function(tot,d) { return tot+d.count;},0);
+
+			return Promise.all([
+				computeTier(rws,years[3],"annot-y",fc), //compute years
+				computeStone(rws,sum,"annot-a") //compute all
+			])
 		})
 		.catch(function(err) { return Error("server.model.computeRewards.years:"+err)})
 	
@@ -171,15 +155,6 @@ function query (entry,p,user,token) {
  	})
  }
  
-/*function getToken() {
-	return new Promise(function(ful,rej) {
-		fs.readFile(path.join(__dirname, "..","middlewares","auth.json"), function(err, data){
-			if(err) { rej(Error("server.model.getToken:"+err)); }
-			else { ful(JSON.parse(data).token);}
-		});
-	});
-}*/
-
 function computeWeek(data) { //return array of days
 	return new Promise(function(ful,rej) {
 		ful(data.map(function(d){ 
@@ -227,43 +202,68 @@ function groupBy(data,fk,fd) {
 	})
 }
 
-function computeTier(rws,data,b,fc,fh) {
+function computeTier(rws,data,id,fc) {
 	return new Promise(function(ful,rej) {
-		var sum=0,nb=0,current=0,max={count:-1};//empty day
+		var b = getBadge(id);
+		var current=0,max={count:-1};//empty day
 		var tier0=[],tier1=[],tier2=[],tier3=[];
 		var date=new Date();
 
 		//split by tier + sum + max + currentcount
 		data.forEach(function(d){
-			sum+=d.count;
-			nb+=1;
 			if(d.count>max.count) {max=d;}
-			if(d.count<b.tier1) {tier0.push(d);}
-			else if(d.count<b.tier2) {tier1.push(d);}
-			else if(d.count<b.tier3) {tier2.push(d);}
+			if(d.count<b.tier[0]) {tier0.push(d);}
+			else if(d.count<b.tier[1]) {tier1.push(d);}
+			else if(d.count<b.tier[2]) {tier2.push(d);}
 			else {tier3.push(d);}
 			current+=fc(d,b,date);
 		})
 		//current tier
 		var tier,next;
-		if(current<b.tier1) {tier=0;next=b.tier1;}
-		else if(current<b.tier2) {tier=1;next=b.tier2;}
-		else if(current<b.tier3) {tier=2;next=b.tier3;}
-		else {tier=3;next=current;}
+		if(current<b.tier[0]) {tier=0;next=b.tier[0];}
+		else if(current<b.tier[1]) {tier='b';next=b.tier[1];}
+		else if(current<b.tier[2]) {tier='s';next=b.tier[2];}
+		else {tier='g';next=current;}
 		//insert
 		rws.push({
 			badgeid:b.id, 
-			count1:tier1.length,
-			count2:tier2.length,
-			count3:tier3.length,
-			highscore:max.count,
-			highitem:fh(max),
+			count:[tier0.length,tier1.length,tier2.length,tier3.length],
 			currenttier:tier,
 			currentcount:current,
 			next:next,
 			percent:Math.round(current*100/next)
 		});
-		//console.log("push rewards [",user,b.id,"... ]");
+		console.log("push reward",b.id);
+		ful(max.count);
+	}).then(function(mcount){ return computeStone(rws,mcount,id); })
+}
+
+function computeStone(rws,sum,id) {
+	return new Promise(function(ful,rej) {
+		var b = getBadge(id+"s");
+		//current tier
+		var tier,next;
+		var found=false;
+		for(var i=0;i<b.tier.length && !found;i++){
+			if(sum<b.tier[i]) {
+				tier=i;
+				next=b.tier[i];
+				found=true;
+			}
+		}
+		//maximum tier
+		if(!found) {tier=b.tier.length;next=sum;}
+
+		//insert
+		rws.push({
+			badgeid:b.id, 
+			count:[],
+			currenttier:tier,
+			currentcount:sum,
+			next:next,
+			percent:Math.round(sum*100/next)
+		});
+		console.log("push reward",b.id);
 		ful("Reward INSERTED");
 	})
 }
