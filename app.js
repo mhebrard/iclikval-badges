@@ -15,7 +15,7 @@ var accessLogStream = fs.createWriteStream(path.join(__dirname,'access.log'), {f
 
 //config app
 app.set('view engine', 'pug'); 
-app.set('views', path.join(__dirname, 'pug'));
+app.set('views', path.join(__dirname, 'views'));
 
 //use middleware
 app.use(express.static( path.join(__dirname,'public') ));
@@ -33,6 +33,7 @@ app.get('/',function(req,res) {
 });
 
 app.use('/get', require('./routes/get.js'));
+app.use('/info', require('./routes/info.js'));
 
 /*
 app.get('/rewards',function(req,res) {
