@@ -9,8 +9,6 @@
 		"tier":[300,900,1500]},	
 	{"title":"Yearly Annotator","id":"annot-y","legend":"Number of annotations added this year",
 		"tier":[4000,12000,20000]},
-	{"title":"Master Annotator","id":"annot-a","legend":"Total number of annotations",
-		"tier":[10,25,50,100,250,500,1000,2500,5000,10000,25000,50000,100000,250000,500000,1000000]},
 	{"title":"Annotation Sprint","id":"annot-ds","legend":"Maximum annotation added in one day",
 		"tier":[10,25,50,100,250,500,1000,2500,5000,10000,25000,50000,100000,250000,500000,1000000]},
 	{"title":"Annotation Run","id":"annot-wes","legend":"Maximum annotation added in one weekend",
@@ -20,5 +18,7 @@
 	{"title":"Annotation Race","id":"annot-ms","legend":"Maximum annotation added in one month",
 		"tier":[10,25,50,100,250,500,1000,2500,5000,10000,25000,50000,100000,250000,500000,1000000]},
 	{"title":"Annotation Marathon","id":"annot-ys","legend":"Maximum annotation added in one year",
+		"tier":[10,25,50,100,250,500,1000,2500,5000,10000,25000,50000,100000,250000,500000,1000000]},
+	{"title":"Master Annotator","id":"annot-as","legend":"Total number of annotations",
 		"tier":[10,25,50,100,250,500,1000,2500,5000,10000,25000,50000,100000,250000,500000,1000000]}
 ]

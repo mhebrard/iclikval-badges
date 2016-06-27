@@ -38,9 +38,6 @@ function computeRewards(annots,rws) {
 				}
 				else {return 0;}
 			}
-			/*fh=function(d) { //high day display
-				return fdate(d.group.year,d.group.month,d.group.day);
-			}*/
 			fk=function(d) { //key for week
 				return d.group.year+"-"+d.group.week;
 			} 
@@ -83,18 +80,6 @@ function computeRewards(annots,rws) {
 				}
 				else {return 0;}
 			}
-			/*fh=function(d) { //high week display
-				var date = new Date(d.group.year,d.group.month-1,d.group.day);
-				var mon = new Date(d.group.year,d.group.month-1,d.group.day);
-				var sun = new Date(date.setTime( date.getTime() + 6 * 86400000 ));
-				return fdate(mon.getFullYear(),mon.getMonth()+1,mon.getDate())+" to "+fdate(sun.getFullYear(),sun.getMonth()+1,sun.getDate())
-			}*/
-			/*var fhwe=function(d) { //high weekend display
-				var date = new Date(d.group.year,d.group.month-1,d.group.day);
-				var sat = new Date(date.setTime( date.getTime() + 5 * 86400000 ));
-				var sun = new Date(date.setTime( date.getTime() + 1 * 86400000 ));
-				return fdate(sat.getFullYear(),sat.getMonth()+1,sat.getDate())+" to "+fdate(sun.getFullYear(),sun.getMonth()+1,sun.getDate())
-			}*/
 			var fcm=function(d,b,date){ //current month
 				if(d.group.year==date.getFullYear() 
 					&& d.group.month==date.getMonth()+1) {
@@ -102,9 +87,6 @@ function computeRewards(annots,rws) {
 				}
 				else {return 0;}
 			}
-			/*var fhm=function(d) { //high month display
-				return fdate(d.group.year,d.group.month);
-			}*/
 			fk=function(d) { //key for year
 				return d.group.year;
 			}
@@ -129,13 +111,12 @@ function computeRewards(annots,rws) {
 				}
 				else {return 0;}
 			}
-			/*fh = function(d) { //high year display
-				return fdate(d.group.year);
-			}*/
+
+			var sum=years[3].reduce(function(tot,d) { return tot+d.count;},0);
 
 			return Promise.all([
 				computeTier(rws,years[3],"annot-y",fc), //compute years
-				computeStone(rws,years[3],"annot-a") //compute all
+				computeStone(rws,sum,"annot-a") //compute all
 			])
 		})
 		.catch(function(err) { return Error("server.model.computeRewards.years:"+err)})
@@ -174,15 +155,6 @@ function query (entry,p,user,token) {
  	})
  }
  
-/*function getToken() {
-	return new Promise(function(ful,rej) {
-		fs.readFile(path.join(__dirname, "..","middlewares","auth.json"), function(err, data){
-			if(err) { rej(Error("server.model.getToken:"+err)); }
-			else { ful(JSON.parse(data).token);}
-		});
-	});
-}*/
-
 function computeWeek(data) { //return array of days
 	return new Promise(function(ful,rej) {
 		ful(data.map(function(d){ 
@@ -256,26 +228,19 @@ function computeTier(rws,data,id,fc) {
 		rws.push({
 			badgeid:b.id, 
 			count:[tier0.length,tier1.length,tier2.length,tier3.length],
-			//count2:tier2.length,
-			//count3:tier3.length,
-			//highscore:max.count,
-			//highitem:fh(max),
 			currenttier:tier,
 			currentcount:current,
 			next:next,
 			percent:Math.round(current*100/next)
 		});
 		console.log("push reward",b.id);
-		ful("Reward INSERTED");
-	})
+		ful(max.count);
+	}).then(function(mcount){ return computeStone(rws,mcount,id); })
 }
 
-function computeStone(rws,data,id) {
+function computeStone(rws,sum,id) {
 	return new Promise(function(ful,rej) {
 		var b = getBadge(id+"s");
-		var sum=data.reduce(function(tot,d) {
-			return tot+d.count;
-		},0)
 		//current tier
 		var tier,next;
 		var found=false;
@@ -288,14 +253,11 @@ function computeStone(rws,data,id) {
 		}
 		//maximum tier
 		if(!found) {tier=b.tier.length;next=sum;}
-		var today = new Date();
 
 		//insert
 		rws.push({
 			badgeid:b.id, 
 			count:[],
-			//highscore:sum,
-			//highitem:fdate(today.getFullYear(),today.getMonth()+1,today.getDate()),
 			currenttier:tier,
 			currentcount:sum,
 			next:next,

@@ -5,6 +5,7 @@
 	var badges;
 		
 	//METHODS//
+	//Load//
 	ick.load = function(server,key,user) {
 		param.server=server;
 		param.key=key;
@@ -62,99 +63,7 @@
 		});
 	}
 
-	function initView() {
-		console.log("initView");
-		//style
-		d3.select("head").selectAll("#ick-css").data(["style"])
-		.enter().append("style").attr("id","ick-css").text(
-			"#ick-main .progress{position:relative;}\n"
-			+"#ick-main .progress span{position:absolute;display:block;width:100%;color:black;}\n"
-			+".ick-glyph .fg { fill: #000;} .ick-glyph .bg { fill: #fff;}\n"
-		)
-		//hidden div
-		//d3.select("body").selectAll(".ick-hide").data(["tip"])
-		//.enter().append("div").attr("id",function(d){return "ick-"+d;}).attr("class", "ick-hide");
-		/*ok*/
-		//main
-		var div = d3.select(".ick-content").attr("id","ick-main")
-		var nav = div.append("div").attr("class","clearfix").append("div").attr("class","ick-nav btn-group pull-right")
-		.style("margin","5px")
-		nav.selectAll("a").data(["Current","Medals","Milestones"])
-		.enter().append("a")
-			.attr("class","btn btn-default")
-			.attr("href",function(d){ return "#ick-tab"+d; })
-			.text(function(d){ return d; })
-		var panes = div.append("div")
-		
-		//Current div
-		var pan = panes.append("div").attr("id","ick-tabCurrent").attr("class","panel panel-default")
-			pan.append("div").attr("class","panel-heading").text("Current Badge Collection")
-			pan.append("div").attr("class","panel-body")
-
-		//Medals div
-		pan = panes.append("div").attr("id","ick-tabMedals").attr("class","panel panel-default")
-		pan.append("div").attr("class","panel-heading").text("Medals Earned")
-		pan.append("div").attr("class","panel-body")
-
-		//Milestones div
-		pan = panes.append("div").attr("id","ick-tabMilestones").attr("class","panel panel-default")
-		pan.append("div").attr("class","panel-heading").text("Milestones Earned")
-		pan.append("div").attr("class","panel-body")
-
-		//Modal
-		var modal = div.append("div").attr("id","ick-info")
-			.attr("class","modal fade")
-			.append("div").attr("class","modal-dialog")
-			.append("div").attr("class","modal-content")
-		var head = modal.append("div").attr("class","modal-header")
-		head.append("button").attr("class","close")
-			.attr("type","button").attr("data-dismiss","modal")
-			.append("span").html("&times;")
-        head.append("h4").attr("class","modal-title")
-		var body = modal.append("div").attr("class","modal-body")
-			.style("display","flex")
-		body.append("div").append("svg").attr("class","ick-glyph")
-			.attr("width","100px").attr("height","100px")
-			.style("margin","5px").append("use")
-		var sub = body.append("div").style("display","flex")
-			.style("flex-direction","column").style("flex-grow",1)
-		var line = sub.append("div")
-			line.append("label").html("Description:&nbsp;")
-			line.append("span").attr("class","ick-legend")
-		var line = sub.append("div")
-		line.append("label").html("Badges Earned:&nbsp;")
-		line.append("span").attr("class","ick-earned")
-
-		line = sub.append("div")
-		line.append("label").html("Maximum Count:&nbsp")
-		line.append("span").attr("class","ick-highscore")
-		line.append("label").html("&nbspDate:&nbsp")
-		line.append("span").attr("class","ick-highitem")
-		
-		line = sub.append("div")
-		line.append("label").html("Current Count:&nbsp")
-		line.append("span").attr("class","ick-current")
-		line.append("label").html("&nbspNext Medal at:&nbsp")
-		line.append("span").attr("class","ick-next")
-		
-		line = sub.append("div").style("display","flex")
-		line.append("svg").attr("class","ick-current")
-			.attr("width","25px").attr("height","25px")
-			.append("use")
-		line.append("div").attr("class","progress").style("width","100%")
-			.append("div").attr("class","progress-bar progress-bar-info")
-			.attr("aria-valuemin",0).attr("aria-valuemax",100).attr("aria-valuenow",0)
-			.style("width","0").append("span")
-		
-		//modif scroll according to iclikval top menu
-		var offset = 50;
-		$('.ick-nav a').click(function(event) {
-		    event.preventDefault();
-		    $($(this).attr('href'))[0].scrollIntoView();
-		    scrollBy(0, -offset);
-		});
-	}
-
+	//query
 	function getBadges() {
 		return new Promise(function(ful,rej) {
 			d3.json(param.server+"/get/badges/")
@@ -213,6 +122,87 @@
 		});
 	}
 
+	//View
+	function initView() {
+		console.log("initView");
+		//style
+		d3.select("head").selectAll("#ick-css").data(["style"])
+		.enter().append("style").attr("id","ick-css").text(
+			"#ick-main .progress{position:relative; margin-bottom:0px;}\n"
+			+"#ick-main .progress span{position:absolute;display:block;width:100%;color:black;}\n"
+			+".ick-glyph .fg { fill: #000;} .ick-glyph .bg { fill: #fff;}\n"
+		)
+		//hidden div
+		//d3.select("body").selectAll(".ick-hide").data(["tip"])
+		//.enter().append("div").attr("id",function(d){return "ick-"+d;}).attr("class", "ick-hide");
+		/*ok*/
+		//main
+		var div = d3.select(".ick-content").attr("id","ick-main")
+		var nav = div.append("div").attr("class","clearfix").append("div").attr("class","ick-nav btn-group pull-right")
+		.style("margin","5px")
+		nav.selectAll("a").data(["Current","Medals","Milestones"])
+		.enter().append("a")
+			.attr("class","btn btn-default")
+			.attr("href",function(d){ return "#ick-tab"+d; })
+			.text(function(d){ return d; })
+		var panes = div.append("div")
+		
+		//Current div
+		var pan = panes.append("div").attr("id","ick-tabCurrent").attr("class","panel panel-default")
+			pan.append("div").attr("class","panel-heading").text("Current Badge Collection")
+			pan.append("div").attr("class","panel-body")
+
+		//Medals div
+		pan = panes.append("div").attr("id","ick-tabMedals").attr("class","panel panel-default")
+		pan.append("div").attr("class","panel-heading").text("Medals Earned")
+		pan.append("div").attr("class","panel-body")
+
+		//Milestones div
+		pan = panes.append("div").attr("id","ick-tabMilestones").attr("class","panel panel-default")
+		pan.append("div").attr("class","panel-heading").text("Milestones Earned")
+		pan.append("div").attr("class","panel-body")
+
+		//Modal
+		var modal = div.append("div").attr("id","ick-info")
+			.attr("class","modal fade")
+			.append("div").attr("class","modal-dialog")
+			.append("div").attr("class","modal-content")
+		var head = modal.append("div").attr("class","modal-header")
+		head.append("button").attr("class","close")
+			.attr("type","button").attr("data-dismiss","modal")
+			.append("span").html("&times;")
+        head.append("h4").attr("class","modal-title")
+		var body = modal.append("div").attr("class","modal-body")
+			.style("display","flex")
+		body.append("div").append("svg").attr("class","ick-glyph")
+			.attr("width","100px").attr("height","100px")
+			.style("margin","5px").append("use")
+		var sub = body.append("div").style("display","flex")
+			.style("flex-direction","column").style("flex-grow",1)
+		var line = sub.append("div")
+			line.append("label").html("Description:&nbsp;")
+			line.append("span").attr("class","ick-legend")
+		line = sub.append("div")
+		line.append("label").html("Badges Earned:&nbsp;")
+		line.append("span").attr("class","ick-earned")
+		
+		line = sub.append("div")
+		line.append("label").html("Current Count:&nbsp")
+		line.append("span").attr("class","ick-current")
+		line.append("label").html("&nbspNext Medal at:&nbsp")
+		line.append("span").attr("class","ick-next")
+
+		line = sub.append("div").attr("class","ick-progress")
+		
+		//modif scroll according to iclikval top menu
+		var offset = 50;
+		$('.ick-nav a').click(function(event) {
+		    event.preventDefault();
+		    $($(this).attr('href'))[0].scrollIntoView();
+		    scrollBy(0, -offset);
+		});
+	}
+
 	function setView() {
 		console.log("setView");		
 		//Current div
@@ -221,7 +211,7 @@
 			.selectAll("div").data(badges)
 		var enter = cont.enter().append("div")
 			.attr("class",function(d){return "ick-b"+d.id;})
-			.style("text-align","center").style("padding","0px 5px")
+			.style("text-align","center").style("padding","10px 5px")
 			.style("cursor","pointer")
 			.on("click",function(d){ $(this).tooltip('hide'); updateModal(d);})
 			.attr("data-toggle","modal").attr("data-target","#ick-info")
@@ -230,19 +220,17 @@
 			.attr("class","ick-current ick-glyph")
 			.append("use").attr("xlink:href",function(d){return "#"+d.id})
 			.style("margin","5px")
-		enter.append("div").attr("class","progress text-center")
-			.style("width","100%")
-			.append("div").attr("class","progress-bar progress-bar-info")
-			.attr("aria-valuemin",0).attr("aria-valuemax",100).attr("aria-valuenow",0)
-			.style("color","#000").style("width","0").append("span").text("0")
-
+		enter.append("div").attr("class","ick-progress")
+		enter.append("div").style("font-weight","bold").style("text-align","center")
+			.style("width","80px").text(function(d){return d.title;})
+		
 		//Medal div
 		var cont = d3.select("#ick-tabMedals").select(".panel-body")
 			.append("table").attr("class","table table-striped table-hover")
 		var head = cont.append("thead").append("tr").attr()
-			head.append("th").text("Badge Name")
-			head.append("th").style("text-align","center").text("Medals Earned")
-			head.append("th").style("text-align","right").text("Current Count")
+			head.append("th").style("text-align","left").text("Badge Name")
+			head.append("th").style("text-align","left").text("Medals Earned")
+			head.append("th").style("text-align","left").text("Current Count")
 			head.append("th").style("text-align","right").text("Next Medal")
 		var body = cont.append("tbody").selectAll("tr")
 			.data(badges.filter(function(d){return d.tier.length==3;}))
@@ -250,21 +238,19 @@
 			.attr("class",function(d){return "ick-b"+d.id;})
 			.style("cursor","pointer")
 			.on("click",function(d){$(this).tooltip('hide'); updateModal(d);})
-			.attr("data-toggle","modal")
-			.attr("data-target","#ick-info")
+			.attr("data-toggle","modal").attr("data-target","#ick-info")
 			.attr("title",function(d) {return d.legend;})
 			enter.append("td").text(function(d){return d.title;})
 			enter.append("td").attr("class","ick-earned").style("display","flex")
-			enter.append("td").attr("class","ick-current").style("text-align","right")
-			enter.append("td").attr("class","ick-next").style("text-align","right")	
+			enter.append("td").attr("colspan",2).append("div").attr("class","ick-progress")
 		
 		//Milestones div
 		var cont = d3.select("#ick-tabMilestones").select(".panel-body")
 			.append("table").attr("class","table table-striped table-hover")
 		var head = cont.append("thead").append("tr").attr()
-			head.append("th").text("Badge Name")
-			head.append("th").text("Milestones Earned")
-			head.append("th").style("text-align","right").text("Current Count")
+			head.append("th").style("text-align","left").text("Badge Name")
+			head.append("th").style("text-align","left").text("Milestones Earned")
+			head.append("th").style("text-align","left").text("Current Count")
 			head.append("th").style("text-align","right").text("Next Stone")
 		var body = cont.append("tbody").selectAll("tr")
 			.data(badges.filter(function(d){return d.tier.length>3;}))
@@ -272,64 +258,65 @@
 			.attr("class",function(d){return "ick-b"+d.id;})
 			.style("cursor","pointer")
 			.on("click",function(d){$(this).tooltip('hide'); updateModal(d);})
-			.attr("data-toggle","modal")
-			.attr("data-target","#ick-info")
+			.attr("data-toggle","modal").attr("data-target","#ick-info")
 			.attr("title",function(d) {return d.legend;})
 			enter.append("td").text(function(d){return d.title;})
 			enter.append("td").attr("class","ick-earned")
-			enter.append("td").attr("class","ick-current").style("text-align","right")
-			enter.append("td").attr("class","ick-next").style("text-align","right")
+			enter.append("td").attr("colspan",2).append("div").attr("class","ick-progress")
 
 		$(function() { $('[data-toggle="modal"]').tooltip(); });
 		
 		return Promise.resolve();
 	}
 
-	function updateModal(d) {
-		var div = d3.select("#ick-info").datum(d);
-		div.select(".modal-title").text(d.title)
-		div.select(".ick-legend").text(d.legend)
-		updateEarned(div,d);
-		div.selectAll(".ick-highscore").text(f(d.highscore))
-		div.select(".ick-highitem").text(d.highitem)
-		div.select("span.ick-current").text(f(d.currentcount))
-		div.select("svg.ick-current").attr("class", function() {
-			var t=d.currenttier;
-			while(t>10){t-=10;}
-			return "ick-current ick-"+t;
+	function setBadges() {
+		//update earn table (2) update progress table (2)
+		d3.selectAll("tr").filter(function(d){return d && d.next;})
+		.each(function(d) { 
+			updateEarned(d3.select(this),d); 
+			updateProgress(d3.select(this),d,true);
 		})
-		div.select(".progress-bar").style("width",d.percent+"%")
-			.attr("aria-valuemax",d.next).attr("aria-valuenow",f(d.currentcount))
-			.select("span").text(f(d.currentcount))
-		div.select(".ick-next").html(function(){return d.currentcount==d.next ? "-" : f(d.next)})
-		//shape
-		div.selectAll("svg").selectAll("use").attr("xlink:href","#"+d.id)
+		//update progress current (1)
+		d3.selectAll("div").filter(function(d){return d && d.next;})
+		.each(function(d) { 
+			updateProgress(d3.select(this),d,false);
+		})
+
+		//update shape
+		d3.selectAll("svg").filter(function(d){return d && d.next;})
+		.each(function(d){
+			updateSvg(d3.select(this),d);
+		})
 	}
 
+	//update
 	function updateEarned(div,d) {
-		//console.log("uE",div,d);
 		var line=div.select(".ick-earned").html("");
 		if(d.tier.length==3) {//medal
 			line.append("span").style("flex-grow",1)
 				.style("text-align","right").style("font-weight","bold")
+				.attr("class",function(){ return d.count[1]==0 ? "text-muted" : "";})
 				.html("&nbsp;"+d.count[1]+"x"+"&nbsp;")
-			line.append("svg").attr("class","ick-b").style("flex-grow",0)
-				.attr("width","25px").attr("height","25px")
+			line.append("svg").attr("class",function(){ return d.count[1]==0 ? "ick-0" : "ick-b";} )
+				.style("flex-grow",0).attr("width","25px").attr("height","25px")
 				.append("use")
 			
 			line.append("span").style("flex-grow",1)
 				.style("text-align","right").style("font-weight","bold")
+				.attr("class",function(){ return d.count[2]==0 ? "text-muted" : "";})
 				.html("&nbsp;"+d.count[2]+"x"+"&nbsp;")
-			line.append("svg").attr("class","ick-s").style("flex-grow",0)
-				.attr("width","25px").attr("height","25px")
+			line.append("svg").attr("class",function(){ return d.count[2]==0 ? "ick-0" : "ick-s";} )
+				.style("flex-grow",0).attr("width","25px").attr("height","25px")
 				.append("use")
 
 			line.append("span").style("flex-grow",1)
 				.style("text-align","right").style("font-weight","bold")
+				.attr("class",function(){ return d.count[3]==0 ? "text-muted" : "";})
 				.html("&nbsp;"+d.count[3]+"x"+"&nbsp;")
-			line.append("svg").attr("class","ick-g").style("flex-grow",0)
-				.attr("width","25px").attr("height","25px")
+			line.append("svg").attr("class",function(d){ return d.count[3]==0 ? "ick-0" : "ick-g";} )
+				.style("flex-grow",0).attr("width","25px").attr("height","25px")
 				.append("use")
+			line.append("span").style("flex-grow",1)//space
 		}
 		else {//milestone
 			var t=d.currenttier;
@@ -350,12 +337,70 @@
 				.attr("width","25px").attr("height","25px")
 				.append("use")
 			}
-			
 		}
-		//shape
-		div.selectAll("svg").selectAll("use").attr("xlink:href","#"+d.id)
 	}
 
+	function updateProgress(div,d,b) {
+		var line=div.select(".ick-progress").style("display","flex").html("");
+		if(b){
+			line.append("svg").attr("class","ick-current")
+			.attr("width","25px").attr("height","25px")
+			.append("use")
+		}
+		
+		line.append("div").attr("class","progress").style("width","100%")
+			.append("div").attr("class","progress-bar progress-bar-info")
+			.attr("aria-valuemin",0).attr("aria-valuemax",d.next).attr("aria-valuenow",f(d.currentcount))
+			.style("width",d.percent+"%")
+			.append("span").text(f(d.currentcount))
+
+		if(b){
+			line.append("svg").attr("class","ick-next")
+			.attr("width","25px").attr("height","25px")
+			.append("use")
+		}
+	}
+
+	function updateSvg(svg,d) {
+		
+		svg.attr("class", function(){
+			if(svg.classed("ick-current")){
+				var t=d.currenttier;
+				while(t>10){t-=10;}
+				return "ick-current ick-"+t;
+			}
+			else if(svg.classed("ick-next")){
+				var t=d.currenttier;
+				if(t==0 && d.tier.length==3) {t="b";}
+				else if(t=="b") {t="s";}
+				else if(t=="s") {t="g";}
+				else if(t=="g") {t="g";}
+				else { 
+					while(t>10){t-=10;}
+					t++;
+				}
+				return "ick-next ick-"+t;
+			}
+			else { return svg.attr("class");}
+		})
+		.selectAll("use").attr("xlink:href","#"+d.id)
+	}
+
+	function updateModal(d) {
+		var div = d3.select("#ick-info").datum(d);
+		div.select(".modal-title").text(d.title)
+		div.select(".ick-legend").text(d.legend)
+		updateEarned(div,d);
+		div.select("span.ick-current").text(f(d.currentcount))
+		div.select("span.ick-next").html(function(){return d.currentcount==d.next ? "-" : f(d.next)})
+		updateProgress(div,d,true);
+
+		div.selectAll("svg").each(function(){
+			updateSvg(d3.select(this),d);
+		})
+	}
+
+	//utils
 	function getBadge(id) { //return the badge with id=id
 		var obj = 0;
 		for(var i=0;(obj==0 && i<badges.length);i++) {
@@ -364,34 +409,6 @@
 		return obj;
 	}
 
-	function setBadges() {
-		d3.selectAll("svg.ick-current").filter(function(d){return d && d.next;})
-			.attr("class",function(d){ //stack the 10e stones
-				var t=d.currenttier;
-				while(t>10){t-=10;}
-				return "ick-current ick-"+t;
-			})
-
-		d3.selectAll(".progress-bar").filter(function(d){return d && d.next;})
-			.style("width",function(d){return d.percent+"%";})
-			.attr("aria-valuemax",function(d){ return d.next;})
-			.attr("aria-valuenow",function(d){ return d.currentcount;})
-			.selectAll("span").text(function(d){ return f(d.currentcount);})
-
-		//Earned
-		d3.selectAll("tr").filter(function(d){return d && d.next;})
-		.each(function(d) { updateEarned(d3.select(this),d); })
-		
-		//d3.selectAll(".ick-highscore").filter(function(d){return d && d.next;})
-		//	.text(function(d) {return f(d.highscore);})
-		//d3.selectAll(".ick-highitem").filter(function(d){return d && d.next;})
-		//	.text(function(d) {return d.highitem;})
-		d3.selectAll("td.ick-current").filter(function(d){return d && d.next;})
-			.text(function(d){return f(d.currentcount);})
-		d3.selectAll(".ick-next").filter(function(d){return d && d.next;})
-			.html(function(d){return d.currentcount==d.next ? "-" : f(d.next)})
-	}
-	
 	function setError(e) {
 		var div = d3.select(".ick-content").attr("id","ick-main")
 			.append("div").attr("class","alert alert-danger")
