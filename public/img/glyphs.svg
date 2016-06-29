@@ -1,27 +1,28 @@
-<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" height="0px" width="0px">
 	<defs>
 		<style type="text/css"><![CDATA[
-			.ick-0 .fg { fill: #BBB;} .ick-0 .bg { fill: #fff;}
+			.ick-glyph {color: #000; fill: #fff;}
+			.ick-0 {color: #BBB; fill: #fff;}
 
-			.ick-b .fg { fill: #952;} .ick-b .bg { fill: #C73;}
-			.ick-s .fg { fill: #889;} .ick-s .bg { fill: #BBC;}
-			.ick-g .fg { fill: #970;} .ick-g .bg { fill: #C90;}
-			.ick-j .fg { fill: #096;} .ick-j .bg { fill: #0C8;}
+			.ick-b {color: #952; fill: #C73;}
+			.ick-s {color: #889; fill: #BBC;}
+			.ick-g {color: #970; fill: #C90;}
+			.ick-j {color: #096; fill: #0C8;}
 
 			/*HSV fg = x 100 60 / bg = x 100 80 / x + 30 */
-			.ick-0 .fg { fill: #BBB;} .ick-0 .bg { fill: #fff;}
-			.ick-1 .fg { fill: #900;} .ick-1 .bg { fill: #c00;}
-			.ick-2 .fg { fill: #960;} .ick-2 .bg { fill: #c60;}
-			.ick-3 .fg { fill: #990;} .ick-3 .bg { fill: #cc0;}
-			.ick-4 .fg { fill: #690;} .ick-4 .bg { fill: #6c0;}
-			.ick-5 .fg { fill: #090;} .ick-5 .bg { fill: #0c0;}
-			/*.ick-6 .fg { fill: #096;} .ick-6 .bg { fill: #0c6;}*/
-			.ick-6 .fg { fill: #099;} .ick-6 .bg { fill: #0cc;}
-			.ick-7 .fg { fill: #069;} .ick-7 .bg { fill: #06c;}
-			/*.ick-9 .fg { fill: #009;} .ick-9 .bg { fill: #00c;}*/
-			.ick-8 .fg { fill: #609;} .ick-8 .bg { fill: #60c;}
-			.ick-9 .fg { fill: #909;} .ick-9 .bg { fill: #c0c;}
-			.ick-10 .fg { fill: #906;} .ick-10 .bg { fill: #c06;}
+			.ick-0 {color: #BBB; fill: #fff;}
+			.ick-1 {color: #900; fill: #c00;}
+			.ick-2 {color: #960; fill: #c60;}
+			.ick-3 {color: #990; fill: #cc0;}
+			.ick-4 {color: #690; fill: #6c0;}
+			.ick-5 {color: #090; fill: #0c0;}
+			/*.ick-6 {color: #096; fill: #0c6;}*/
+			.ick-6 {color: #099; fill: #0cc;}
+			.ick-7 {color: #069; fill: #06c;}
+			/*.ick-9 {color: #009; fill: #00c;}*/
+			.ick-8 {color: #609; fill: #60c;}
+			.ick-9 {color: #909; fill: #c0c;}
+			.ick-10 {color: #906; fill: #c06;}
 		]]></style>
 
 		<filter id="bevel-shadow" x="-50%" y="-50%" width="200%" height="200%">
@@ -51,184 +52,132 @@
 				<feMergeNode in="diff2"/>
 			</feMerge>
 		</filter>
-		<path id="ring" d="M50,0 A50,50 0 1,1 50,100 A50,50 0 0,1 50,00 v10 A40,40 1 0,0 50,90 A40,40 1 1,0 50,10 Z"/>
-		<path id="lozange" d="M50,0 L100,50 50,100 0,50 50,0 v12 L12,50 50,88 88,50 50,12 Z"/>
-		<path id="square" d="M0,0 v100 h100 v-100 h-100 l10,10 h80 v80 h-80 v-80 Z"/>
-		<path id="octo" d="M30,0 h40 l30,30 v40 l-30,30 h-40 l-30,-30 v-40 l30,-30 3,12 -21,21 v34 l21,21 h34 l21,-21 v-34 l-21,-21 h-34 Z"/>
-		<path id="miles" d="M30,0 h40 l30,30 v70 h-100 v-70 l30,-30 3,12 -21,21 v55 h76 v-55 l-21,-21 h-34 Z"/> 
+		<path id="ring" fill="currentColor" d="M50,0 A50,50 0 1,1 50,100 A50,50 0 0,1 50,00 v10 A40,40 1 0,0 50,90 A40,40 1 1,0 50,10 Z"/>
+		<path id="lozange" fill="currentColor" d="M50,0 L100,50 50,100 0,50 50,0 v12 L12,50 50,88 88,50 50,12 Z"/>
+		<path id="square" fill="currentColor" d="M0,0 v100 h100 v-100 h-100 l10,10 h80 v80 h-80 v-80 Z"/>
+		<path id="octo" fill="currentColor" d="M30,0 h40 l30,30 v40 l-30,30 h-40 l-30,-30 v-40 l30,-30 3,12 -21,21 v34 l21,21 h34 l21,-21 v-34 l-21,-21 h-34 Z"/>
+		<path id="miles" fill="currentColor" d="M30,0 h40 l30,30 v70 h-100 v-70 l30,-30 3,12 -21,21 v55 h76 v-55 l-21,-21 h-34 Z"/> 
 		
-		<path id="tags" transform="scale(1,-1) scale(0.03)" unicode="&#xf02c;"
+		<path id="tags" transform="scale(1,-1) scale(0.03)" fill="currentColor" unicode="&#xf02c;"
 			d="M448 1088q0 53 -37.5 90.5t-90.5 37.5t-90.5 -37.5t-37.5 -90.5t37.5 -90.5t90.5 -37.5t90.5 37.5t37.5 90.5zM1515 512q0 -53 -37 -90l-491 -492q-39 -37 -91 -37q-53 0 -90 37l-715 716q-38 37 -64.5 101t-26.5 117v416q0 52 38 90t90 38h416q53 0 117 -26.5t102 -64.5 l715 -714q37 -39 37 -91zM1899 512q0 -53 -37 -90l-491 -492q-39 -37 -91 -37q-36 0 -59 14t-53 45l470 470q37 37 37 90q0 52 -37 91l-715 714q-38 38 -102 64.5t-117 26.5h224q53 0 117 -26.5t102 -64.5l715 -714q37 -39 37 -91z" />
 
-		<path id="sun-o" transform="scale(1,-1) scale(0.03)" unicode="&#xf185;"
+		<path id="sun-o" transform="scale(1,-1) scale(0.03)" fill="currentColor" unicode="&#xf185;"
 			d="M1472 640q0 117 -45.5 223.5t-123 184t-184 123t-223.5 45.5t-223.5 -45.5t-184 -123t-123 -184t-45.5 -223.5t45.5 -223.5t123 -184t184 -123t223.5 -45.5t223.5 45.5t184 123t123 184t45.5 223.5zM1748 363q-4 -15 -20 -20l-292 -96v-306q0 -16 -13 -26q-15 -10 -29 -4 l-292 94l-180 -248q-10 -13 -26 -13t-26 13l-180 248l-292 -94q-14 -6 -29 4q-13 10 -13 26v306l-292 96q-16 5 -20 20q-5 17 4 29l180 248l-180 248q-9 13 -4 29q4 15 20 20l292 96v306q0 16 13 26q15 10 29 4l292 -94l180 248q9 12 26 12t26 -12l180 -248l292 94 q14 6 29 -4q13 -10 13 -26v-306l292 -96q16 -5 20 -20q5 -16 -4 -29l-180 -248l180 -248q9 -12 4 -29z" />
-		<path id="tag" transform="scale(1,-1) scale(0.03)" unicode="&#xf02b;"
+		<path id="tag" transform="scale(1,-1) scale(0.03)" fill="currentColor" unicode="&#xf02b;"
 			d="M448 1088q0 53 -37.5 90.5t-90.5 37.5t-90.5 -37.5t-37.5 -90.5t37.5 -90.5t90.5 -37.5t90.5 37.5t37.5 90.5zM1515 512q0 -53 -37 -90l-491 -492q-39 -37 -91 -37q-53 0 -90 37l-715 716q-38 37 -64.5 101t-26.5 117v416q0 52 38 90t90 38h416q53 0 117 -26.5t102 -64.5 l715 -714q37 -39 37 -91z" />
-		<path id="glass" transform="scale(1,-1) scale(0.03)" unicode="&#xf000;"
+		<path id="glass" transform="scale(1,-1) scale(0.03)" fill="currentColor" unicode="&#xf000;"
 			d="M1699 1350q0 -35 -43 -78l-632 -632v-768h320q26 0 45 -19t19 -45t-19 -45t-45 -19h-896q-26 0 -45 19t-19 45t19 45t45 19h320v768l-632 632q-43 43 -43 78q0 23 18 36.5t38 17.5t43 4h1408q23 0 43 -4t38 -17.5t18 -36.5z" />
-		<path id="calendar-o" transform="scale(1,-1) scale(0.03)" unicode="&#xf133;"
+		<path id="calendar-o" transform="scale(1,-1) scale(0.03)" fill="currentColor" unicode="&#xf133;"
 			d="M128 -128h1408v1024h-1408v-1024zM512 1088v288q0 14 -9 23t-23 9h-64q-14 0 -23 -9t-9 -23v-288q0 -14 9 -23t23 -9h64q14 0 23 9t9 23zM1280 1088v288q0 14 -9 23t-23 9h-64q-14 0 -23 -9t-9 -23v-288q0 -14 9 -23t23 -9h64q14 0 23 9t9 23zM1664 1152v-1280 q0 -52 -38 -90t-90 -38h-1408q-52 0 -90 38t-38 90v1280q0 52 38 90t90 38h128v96q0 66 47 113t113 47h64q66 0 113 -47t47 -113v-96h384v96q0 66 47 113t113 47h64q66 0 113 -47t47 -113v-96h128q52 0 90 -38t38 -90z" />
-		<path id="calendar" transform="scale(1,-1) scale(0.03)" unicode="&#xf073;"
+		<path id="calendar" transform="scale(1,-1) scale(0.03)" fill="currentColor" unicode="&#xf073;"
 			d="M128 -128h288v288h-288v-288zM480 -128h320v288h-320v-288zM128 224h288v320h-288v-320zM480 224h320v320h-320v-320zM128 608h288v288h-288v-288zM864 -128h320v288h-320v-288zM480 608h320v288h-320v-288zM1248 -128h288v288h-288v-288zM864 224h320v320h-320v-320z M512 1088v288q0 13 -9.5 22.5t-22.5 9.5h-64q-13 0 -22.5 -9.5t-9.5 -22.5v-288q0 -13 9.5 -22.5t22.5 -9.5h64q13 0 22.5 9.5t9.5 22.5zM1248 224h288v320h-288v-320zM864 608h320v288h-320v-288zM1248 608h288v288h-288v-288zM1280 1088v288q0 13 -9.5 22.5t-22.5 9.5h-64 q-13 0 -22.5 -9.5t-9.5 -22.5v-288q0 -13 9.5 -22.5t22.5 -9.5h64q13 0 22.5 9.5t9.5 22.5zM1664 1152v-1280q0 -52 -38 -90t-90 -38h-1408q-52 0 -90 38t-38 90v1280q0 52 38 90t90 38h128v96q0 66 47 113t113 47h64q66 0 113 -47t47 -113v-96h384v96q0 66 47 113t113 47 h64q66 0 113 -47t47 -113v-96h128q52 0 90 -38t38 -90z" />
-		<path id="birthday-cake" transform="scale(1,-1) scale(0.026)" unicode="&#xf1fd;"
+		<path id="birthday-cake" transform="scale(1,-1) scale(0.026)" fill="currentColor" unicode="&#xf1fd;"
 			d="M1792 128v-384h-1792v384q45 0 85 14t59 27.5t47 37.5q30 27 51.5 38t56.5 11t55.5 -11t52.5 -38q29 -25 47 -38t58 -27t86 -14q45 0 85 14.5t58 27t48 37.5q21 19 32.5 27t31 15t43.5 7q35 0 56.5 -11t51.5 -38q28 -24 47 -37.5t59 -27.5t85 -14t85 14t59 27.5t47 37.5 q30 27 51.5 38t56.5 11q34 0 55.5 -11t51.5 -38q28 -24 47 -37.5t59 -27.5t85 -14zM1792 448v-192q-35 0 -55.5 11t-52.5 38q-29 25 -47 38t-58 27t-85 14q-46 0 -86 -14t-58 -27t-47 -38q-22 -19 -33 -27t-31 -15t-44 -7q-35 0 -56.5 11t-51.5 38q-29 25 -47 38t-58 27 t-86 14q-45 0 -85 -14.5t-58 -27t-48 -37.5q-21 -19 -32.5 -27t-31 -15t-43.5 -7q-35 0 -56.5 11t-51.5 38q-28 24 -47 37.5t-59 27.5t-85 14q-46 0 -86 -14t-58 -27t-47 -38q-30 -27 -51.5 -38t-56.5 -11v192q0 80 56 136t136 56h64v448h256v-448h256v448h256v-448h256v448 h256v-448h64q80 0 136 -56t56 -136zM512 1312q0 -77 -36 -118.5t-92 -41.5q-53 0 -90.5 37.5t-37.5 90.5q0 29 9.5 51t23.5 34t31 28t31 31.5t23.5 44.5t9.5 67q38 0 83 -74t45 -150zM1024 1312q0 -77 -36 -118.5t-92 -41.5q-53 0 -90.5 37.5t-37.5 90.5q0 29 9.5 51 t23.5 34t31 28t31 31.5t23.5 44.5t9.5 67q38 0 83 -74t45 -150zM1536 1312q0 -77 -36 -118.5t-92 -41.5q-53 0 -90.5 37.5t-37.5 90.5q0 29 9.5 51t23.5 34t31 28t31 31.5t23.5 44.5t9.5 67q38 0 83 -74t45 -150z" />
-		<path id="newspaper-o" transform="scale(1,-1) scale(0.026)" unicode="&#xf1ea;"
+		<path id="newspaper-o" transform="scale(1,-1) scale(0.026)" fill="currentColor" unicode="&#xf1ea;"
 			d="M1024 1024h-384v-384h384v384zM1152 384v-128h-640v128h640zM1152 1152v-640h-640v640h640zM1792 384v-128h-512v128h512zM1792 640v-128h-512v128h512zM1792 896v-128h-512v128h512zM1792 1152v-128h-512v128h512zM256 192v960h-128v-960q0 -26 19 -45t45 -19t45 19 t19 45zM1920 192v1088h-1536v-1088q0 -33 -11 -64h1483q26 0 45 19t19 45zM2048 1408v-1216q0 -80 -56 -136t-136 -56h-1664q-80 0 -136 56t-56 136v1088h256v128h1792z" />	
 	</defs>
 
 	<symbol id="annot-d" viewBox="0 0 110 110">
 		<g transform="translate(5,5)">
-			<g class="bg">
-				<circle cx="50" cy="50" r="50"/>
-			</g>
-			<g class="fg">
-				<use xlink:href="#ring" style="filter:url(#bevel-shadow);"/>
-				<use x="18" y="74" xlink:href="#sun-o" style="filter:url(#bevel-shadow);"/>
-				<use x="40" y="58" xlink:href="#tag" style="filter:url(#bevel-shadow);"/>
-			</g>
+			<circle cx="50" cy="50" r="50"/>
+			<use xlink:href="#ring" style="filter:url(#bevel-shadow);"/>
+			<use x="18" y="74" xlink:href="#sun-o" style="filter:url(#bevel-shadow);"/>
+			<use x="40" y="58" xlink:href="#tag" style="filter:url(#bevel-shadow);"/>
 		</g>
 	</symbol>
 	<symbol id="annot-we" viewBox="0 0 110 110">
 		<g transform="translate(5,5)">
-			<g class="bg">
-				<circle cx="50" cy="50" r="50"/>
-			</g>
-			<g class="fg">
-				<use xlink:href="#ring" style="filter:url(#bevel-shadow);"/>
-				<use x="18" y="74" xlink:href="#glass" style="filter:url(#bevel-shadow);"/>
-				<use x="40" y="58" xlink:href="#tag" style="filter:url(#bevel-shadow);"/>
-			</g>
+			<circle cx="50" cy="50" r="50"/>
+			<use xlink:href="#ring" style="filter:url(#bevel-shadow);"/>
+			<use x="18" y="74" xlink:href="#glass" style="filter:url(#bevel-shadow);"/>
+			<use x="40" y="58" xlink:href="#tag" style="filter:url(#bevel-shadow);"/>
 		</g>
 	</symbol>
 	<symbol id="annot-w" viewBox="0 0 110 110">
 		<g transform="translate(5,5)">
-			<g class="bg">
-				<circle cx="50" cy="50" r="50"/>
-			</g>
-			<g class="fg">
-				<use xlink:href="#ring" style="filter:url(#bevel-shadow);"/>
-				<use x="24" y="70" xlink:href="#calendar-o" style="filter:url(#bevel-shadow);"/>
-				<use x="40" y="58" xlink:href="#tag" style="filter:url(#bevel-shadow);"/>
-			</g>
+			<circle cx="50" cy="50" r="50"/>
+			<use xlink:href="#ring" style="filter:url(#bevel-shadow);"/>
+			<use x="24" y="70" xlink:href="#calendar-o" style="filter:url(#bevel-shadow);"/>
+			<use x="40" y="58" xlink:href="#tag" style="filter:url(#bevel-shadow);"/>
 		</g>
 	</symbol>
 	<symbol id="annot-m" viewBox="0 0 110 110">
 		<g transform="translate(5,5)">
-			<g class="bg">
-				<circle cx="50" cy="50" r="50"/>
-			</g>
-			<g class="fg">
-				<use xlink:href="#ring" style="filter:url(#bevel-shadow);"/>
-				<use x="24" y="70" xlink:href="#calendar" style="filter:url(#bevel-shadow);"/>
-				<use x="40" y="58" xlink:href="#tag" style="filter:url(#bevel-shadow);"/>
-			</g>
+			<circle cx="50" cy="50" r="50"/>
+			<use xlink:href="#ring" style="filter:url(#bevel-shadow);"/>
+			<use x="24" y="70" xlink:href="#calendar" style="filter:url(#bevel-shadow);"/>
+			<use x="40" y="58" xlink:href="#tag" style="filter:url(#bevel-shadow);"/>
 		</g>
 	</symbol>
 	<symbol id="annot-y" viewBox="0 0 110 110">
 		<g transform="translate(5,5)">
-			<g class="bg">
-				<circle cx="50" cy="50" r="50"/>
-			</g>
-			<g class="fg">
-				<use xlink:href="#ring" style="filter:url(#bevel-shadow);"/>
-				<use x="24" y="70" xlink:href="#birthday-cake" style="filter:url(#bevel-shadow);"/>
-				<use x="40" y="58" xlink:href="#tag" style="filter:url(#bevel-shadow);"/>
-			</g>
+			<circle cx="50" cy="50" r="50"/>
+			<use xlink:href="#ring" style="filter:url(#bevel-shadow);"/>
+			<use x="24" y="70" xlink:href="#birthday-cake" style="filter:url(#bevel-shadow);"/>
+			<use x="40" y="58" xlink:href="#tag" style="filter:url(#bevel-shadow);"/>
 		</g>
 	</symbol>
 	<symbol id="annot-i" viewBox="0 0 110 110">
 		<g transform="translate(5,5)">
-			<g class="bg">
-				<circle cx="50" cy="50" r="50"/>
-			</g>
-			<g class="fg">
-				<use xlink:href="#ring" style="filter:url(#bevel-shadow);"/>
-				<use x="18" y="74" xlink:href="#newspaper-o" style="filter:url(#bevel-shadow);"/>
-				<use x="40" y="58" xlink:href="#tag" style="filter:url(#bevel-shadow);"/>
-			</g>
+			<circle cx="50" cy="50" r="50"/>
+			<use xlink:href="#ring" style="filter:url(#bevel-shadow);"/>
+			<use x="18" y="74" xlink:href="#newspaper-o" style="filter:url(#bevel-shadow);"/>
+			<use x="40" y="58" xlink:href="#tag" style="filter:url(#bevel-shadow);"/>
 		</g>
 	</symbol>
 	<symbol id="annot-as" viewBox="0 0 110 110">
 		<g transform="translate(5,5)">
-			<g class="bg">
-				<path d="M30,0 h40 l30,30 v70 h-100 v-70 l30,-30Z"/>
-			</g>
-			<g class="fg">
-				<use xlink:href="#miles" style="filter:url(#bevel-shadow);"/>
-				<use x="24" y="70" xlink:href="#tags" style="filter:url(#bevel-shadow);"/>
-			</g>
+			<path d="M30,0 h40 l30,30 v70 h-100 v-70 l30,-30Z"/>
+			<use xlink:href="#miles" style="filter:url(#bevel-shadow);"/>
+			<use x="24" y="70" xlink:href="#tags" style="filter:url(#bevel-shadow);"/>
 		</g>
 	</symbol>
 	<symbol id="annot-ds" viewBox="0 0 110 110">
 		<g transform="translate(5,5)">
-			<g class="bg">
-				<path d="M30,0 h40 l30,30 v70 h-100 v-70 l30,-30Z"/>
-			</g>
-			<g class="fg">
-				<use xlink:href="#miles" style="filter:url(#bevel-shadow);"/>
-				<use x="18" y="74" xlink:href="#sun-o" style="filter:url(#bevel-shadow);"/>
-				<use x="40" y="58" xlink:href="#tag" style="filter:url(#bevel-shadow);"/>
-			</g>
+			<path d="M30,0 h40 l30,30 v70 h-100 v-70 l30,-30Z"/>
+			<use xlink:href="#miles" style="filter:url(#bevel-shadow);"/>
+			<use x="18" y="74" xlink:href="#sun-o" style="filter:url(#bevel-shadow);"/>
+			<use x="40" y="58" xlink:href="#tag" style="filter:url(#bevel-shadow);"/>
 		</g>
 	</symbol>
 	<symbol id="annot-wes" viewBox="0 0 110 110">
 		<g transform="translate(5,5)">
-			<g class="bg">
-				<path d="M30,0 h40 l30,30 v70 h-100 v-70 l30,-30Z"/>
-			</g>
-			<g class="fg">
-				<use xlink:href="#miles" style="filter:url(#bevel-shadow);"/>
-				<use x="18" y="74" xlink:href="#glass" style="filter:url(#bevel-shadow);"/>
-				<use x="40" y="58" xlink:href="#tag" style="filter:url(#bevel-shadow);"/>
-			</g>
+			<path d="M30,0 h40 l30,30 v70 h-100 v-70 l30,-30Z"/>
+			<use xlink:href="#miles" style="filter:url(#bevel-shadow);"/>
+			<use x="18" y="74" xlink:href="#glass" style="filter:url(#bevel-shadow);"/>
+			<use x="40" y="58" xlink:href="#tag" style="filter:url(#bevel-shadow);"/>
 		</g>
 	</symbol>
 	<symbol id="annot-ws" viewBox="0 0 110 110">
 		<g transform="translate(5,5)">
-			<g class="bg">
-				<path d="M30,0 h40 l30,30 v70 h-100 v-70 l30,-30Z"/>
-			</g>
-			<g class="fg">
-				<use xlink:href="#miles" style="filter:url(#bevel-shadow);"/>
-				<use x="24" y="70" xlink:href="#calendar-o" style="filter:url(#bevel-shadow);"/>
-				<use x="40" y="58" xlink:href="#tag" style="filter:url(#bevel-shadow);"/>
-			</g>
+			<path d="M30,0 h40 l30,30 v70 h-100 v-70 l30,-30Z"/>
+			<use xlink:href="#miles" style="filter:url(#bevel-shadow);"/>
+			<use x="24" y="70" xlink:href="#calendar-o" style="filter:url(#bevel-shadow);"/>
+			<use x="40" y="58" xlink:href="#tag" style="filter:url(#bevel-shadow);"/>
 		</g>
 	</symbol>
 	<symbol id="annot-ms" viewBox="0 0 110 110">
 		<g transform="translate(5,5)">
-			<g class="bg">
-				<path d="M30,0 h40 l30,30 v70 h-100 v-70 l30,-30Z"/>
-			</g>
-			<g class="fg">
-				<use xlink:href="#miles" style="filter:url(#bevel-shadow);"/>
-				<use x="24" y="70" xlink:href="#calendar" style="filter:url(#bevel-shadow);"/>
-				<use x="40" y="58" xlink:href="#tag" style="filter:url(#bevel-shadow);"/>
-			</g>
+			<path d="M30,0 h40 l30,30 v70 h-100 v-70 l30,-30Z"/>
+			<use xlink:href="#miles" style="filter:url(#bevel-shadow);"/>
+			<use x="24" y="70" xlink:href="#calendar" style="filter:url(#bevel-shadow);"/>
+			<use x="40" y="58" xlink:href="#tag" style="filter:url(#bevel-shadow);"/>
 		</g>
 	</symbol>
 	<symbol id="annot-ys" viewBox="0 0 110 110">
 		<g transform="translate(5,5)">
-			<g class="bg">
-				<path d="M30,0 h40 l30,30 v70 h-100 v-70 l30,-30Z"/>
-			</g>
-			<g class="fg">
-				<use xlink:href="#miles" style="filter:url(#bevel-shadow);"/>
-				<use x="24" y="70" xlink:href="#birthday-cake" style="filter:url(#bevel-shadow);"/>
-				<use x="40" y="58" xlink:href="#tag" style="filter:url(#bevel-shadow);"/>
-			</g>
-		</g>
+			<path d="M30,0 h40 l30,30 v70 h-100 v-70 l30,-30Z"/>
+			<use xlink:href="#miles" style="filter:url(#bevel-shadow);"/>
+			<use x="24" y="70" xlink:href="#birthday-cake" style="filter:url(#bevel-shadow);"/>
+			<use x="40" y="58" xlink:href="#tag" style="filter:url(#bevel-shadow);"/>
+	</g>
 	</symbol>
 	<symbol id="annot-is" viewBox="0 0 110 110">
 		<g transform="translate(5,5)">
-			<g class="bg">
-				<path d="M30,0 h40 l30,30 v70 h-100 v-70 l30,-30Z"/>
-			</g>
-			<g class="fg">
-				<use xlink:href="#miles" style="filter:url(#bevel-shadow);"/>
-				<use x="18" y="74" xlink:href="#newspaper-o" style="filter:url(#bevel-shadow);"/>
-				<use x="40" y="58" xlink:href="#tag" style="filter:url(#bevel-shadow);"/>
-			</g>
+			<path d="M30,0 h40 l30,30 v70 h-100 v-70 l30,-30Z"/>
+			<use xlink:href="#miles" style="filter:url(#bevel-shadow);"/>
+			<use x="18" y="74" xlink:href="#newspaper-o" style="filter:url(#bevel-shadow);"/>
+			<use x="40" y="58" xlink:href="#tag" style="filter:url(#bevel-shadow);"/>
 		</g>
 	</symbol>
 

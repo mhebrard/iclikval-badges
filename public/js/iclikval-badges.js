@@ -130,12 +130,11 @@
 		.enter().append("style").attr("id","ick-css").text(
 			"#ick-main .progress{position:relative; margin-bottom:0px;}\n"
 			+"#ick-main .progress span{position:absolute;display:block;width:100%;color:black;}\n"
-			+".ick-glyph .fg { fill: #000;} .ick-glyph .bg { fill: #fff;}\n"
 		)
 		//hidden div
 		//d3.select("body").selectAll(".ick-hide").data(["tip"])
 		//.enter().append("div").attr("id",function(d){return "ick-"+d;}).attr("class", "ick-hide");
-		/*ok*/
+
 		//main
 		var div = d3.select(".ick-content").attr("id","ick-main")
 		var nav = div.append("div").attr("class","clearfix").append("div").attr("class","ick-nav btn-group pull-right")
@@ -174,9 +173,9 @@
         head.append("h4").attr("class","modal-title")
 		var body = modal.append("div").attr("class","modal-body")
 			.style("display","flex")
-		body.append("div").append("svg").attr("class","ick-glyph")
+		body.append("div").append("svg")
 			.attr("width","100px").attr("height","100px")
-			.style("margin","5px").append("use")
+			.style("margin","5px").append("use").attr("class","ick-glyph")
 		var sub = body.append("div").style("display","flex")
 			.style("flex-direction","column").style("flex-grow",1)
 		var line = sub.append("div")
@@ -217,8 +216,9 @@
 			.attr("data-toggle","modal").attr("data-target","#ick-info")
 			.attr("title",function(d) {return d.legend;})
 		enter.append("svg").attr("width","80px").attr("height","80px")
-			.attr("class","ick-current ick-glyph")
-			.append("use").attr("xlink:href",function(d){return "#"+d.id})
+			.attr("class","ick-current")
+			.append("use").attr("class","ick-glyph")
+			.attr("xlink:href",function(d){return "#"+d.id})
 			.style("margin","5px")
 		enter.append("div").attr("class","ick-progress")
 		enter.append("div").style("font-weight","bold").style("text-align","center")
@@ -280,13 +280,17 @@
 		d3.selectAll("div").filter(function(d){return d && d.next;})
 		.each(function(d) { 
 			updateProgress(d3.select(this),d,false);
+			//update current color
+			d3.select(this).select("use").attr("class",function(){
+				var t=d.currenttier;
+				if(d.tier.length>3) { while(t>10){t-=10;} }
+				return "ick-"+t;
+			})
 		})
 
 		//update shape
 		d3.selectAll("svg").filter(function(d){return d && d.next;})
-		.each(function(d){
-			updateSvg(d3.select(this),d);
-		})
+			.selectAll("use").attr("xlink:href",function(d){ return "#"+d.id; })
 	}
 
 	//update
@@ -297,25 +301,25 @@
 				.style("text-align","right").style("font-weight","bold")
 				.attr("class",function(){ return d.count[1]==0 ? "text-muted" : "";})
 				.html("&nbsp;"+d.count[1]+"x"+"&nbsp;")
-			line.append("svg").attr("class",function(){ return d.count[1]==0 ? "ick-0" : "ick-b";} )
-				.style("flex-grow",0).attr("width","25px").attr("height","25px")
-				.append("use")
+			line.append("svg").style("flex-grow",0)
+				.attr("width","25px").attr("height","25px")
+				.append("use").attr("class","ick-b")
 			
 			line.append("span").style("flex-grow",1)
 				.style("text-align","right").style("font-weight","bold")
 				.attr("class",function(){ return d.count[2]==0 ? "text-muted" : "";})
 				.html("&nbsp;"+d.count[2]+"x"+"&nbsp;")
-			line.append("svg").attr("class",function(){ return d.count[2]==0 ? "ick-0" : "ick-s";} )
-				.style("flex-grow",0).attr("width","25px").attr("height","25px")
-				.append("use")
+			line.append("svg").style("flex-grow",0)
+				.attr("width","25px").attr("height","25px")
+				.append("use").attr("class","ick-s")
 
 			line.append("span").style("flex-grow",1)
 				.style("text-align","right").style("font-weight","bold")
 				.attr("class",function(){ return d.count[3]==0 ? "text-muted" : "";})
 				.html("&nbsp;"+d.count[3]+"x"+"&nbsp;")
-			line.append("svg").attr("class",function(d){ return d.count[3]==0 ? "ick-0" : "ick-g";} )
-				.style("flex-grow",0).attr("width","25px").attr("height","25px")
-				.append("use")
+			line.append("svg").style("flex-grow",0)
+				.attr("width","25px").attr("height","25px")
+				.append("use").attr("class","ick-g")
 			line.append("span").style("flex-grow",1)//space
 		}
 		else {//milestone
@@ -323,19 +327,19 @@
 			while(t>10){
 				var stack=line.append("svg")
 				.attr("width","50px").attr("height","25px");
-				for(i=1;i<=10;i++){
-					stack.append("svg").attr("class","ick-"+i)
+				for(var i=1;i<=10;i++){
+					stack.append("svg")
 					.attr("width","25px").attr("height","25px")
 					.attr("transform","translate("+(2*i)+",0)")
-					.append("use")
+					.append("use").attr("class","ick-"+i)
 				}
 				t-=10;
 			}
 			//line.append("span").html("&nbsp;+&nbsp;")
-			for(i=1;i<=t;i++){
-				line.append("svg").attr("class","ick-"+i)
+			for(var j=1;j<=t;j++){
+				line.append("svg")
 				.attr("width","25px").attr("height","25px")
-				.append("use")
+				.append("use").attr("class","ick-"+j)
 			}
 		}
 	}
@@ -345,7 +349,11 @@
 		if(b){
 			line.append("svg").attr("class","ick-current")
 			.attr("width","25px").attr("height","25px")
-			.append("use")
+			.append("use").attr("class",function(){
+				var t=d.currenttier;
+				while(t>10){t-=10;}
+				return "ick-"+t;
+			})
 		}
 		
 		line.append("div").attr("class","progress").style("width","100%")
@@ -357,19 +365,7 @@
 		if(b){
 			line.append("svg").attr("class","ick-next")
 			.attr("width","25px").attr("height","25px")
-			.append("use")
-		}
-	}
-
-	function updateSvg(svg,d) {
-		
-		svg.attr("class", function(){
-			if(svg.classed("ick-current")){
-				var t=d.currenttier;
-				while(t>10){t-=10;}
-				return "ick-current ick-"+t;
-			}
-			else if(svg.classed("ick-next")){
+			.append("use").attr("class",function(){
 				var t=d.currenttier;
 				if(t==0 && d.tier.length==3) {t="b";}
 				else if(t=="b") {t="s";}
@@ -379,11 +375,9 @@
 					while(t>10){t-=10;}
 					t++;
 				}
-				return "ick-next ick-"+t;
-			}
-			else { return svg.attr("class");}
-		})
-		.selectAll("use").attr("xlink:href","#"+d.id)
+				return "ick-"+t;
+			})
+		}
 	}
 
 	function updateModal(d) {
@@ -395,9 +389,7 @@
 		div.select("span.ick-next").html(function(){return d.currentcount==d.next ? "-" : f(d.next)})
 		updateProgress(div,d,true);
 
-		div.selectAll("svg").each(function(){
-			updateSvg(d3.select(this),d);
-		})
+		div.selectAll("svg").selectAll("use").attr("xlink:href","#"+d.id)
 	}
 
 	//utils
