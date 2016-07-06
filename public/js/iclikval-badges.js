@@ -1,6 +1,6 @@
 !(function() {
 	
-	var ick = { version: "1.1" };
+	var ick = { version: "1.2.1" };
 	var param = {};
 	var badges;
 		

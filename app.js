@@ -44,5 +44,5 @@ app.get('/rewards',function(req,res) {
 
 //listen
 app.listen(port, function() {
-	console.log('Server v1.1 running on',port);
+	console.log('Server running on',port);
 })
