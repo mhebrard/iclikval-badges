@@ -183,7 +183,9 @@
 			line.append("span").attr("class","ick-legend")
 		line = sub.append("div")
 		line.append("label").html("Badges Earned:&nbsp;")
-		line.append("span").attr("class","ick-earned")
+		line.append("span").attr("class","ick-bronze")
+		line.append("span").attr("class","ick-silver")
+		line.append("span").attr("class","ick-gold")
 		
 		line = sub.append("div")
 		line.append("label").html("Current Count:&nbsp")
@@ -206,7 +208,8 @@
 		console.log("setView");		
 		//Current div
 		var cont = d3.select("#ick-tabCurrent").select(".panel-body")
-			.append("div").style("display","flex").style("flex-wrap","wrap")
+			.append("div").attr("class","ick-panel")
+			.style("display","flex").style("flex-wrap","wrap")
 			.selectAll("div").data(badges)
 		var enter = cont.enter().append("div")
 			.attr("class",function(d){return "ick-b"+d.id;})
@@ -228,10 +231,20 @@
 		
 		//Medal div
 		var cont = d3.select("#ick-tabMedals").select(".panel-body")
-			.append("table").attr("class","table table-striped table-hover")
+			.append("table").attr("class","table table-striped table-hover ick-panel")
 		var head = cont.append("thead").append("tr").attr()
 			head.append("th").style("text-align","left").text("Badge Name")
-			head.append("th").style("text-align","center").text("Medals Earned")
+			head.append("th").style("text-align","right").text("Bronze")
+			head.append("th").style("text-align","right").text("Silver")
+			head.append("th").style("text-align","right").text("Gold")
+			head.append("th").text("")
+/*		var sub = head.append("th").style("text-align","center")//.text("Medals Earned")
+			.append("div").style("display","flex")
+			sub.append("span").style("flex-grow",1).style("text-align","right").text("Bronze")
+			sub.append("span").style("flex-grow",1).text("Silver")
+			sub.append("span").style("flex-grow",1).text("Gold")
+			sub.append("span").style("flex-grow",1).text("")
+*/
 		var sub = head.append("th").style("text-align","center").append("div").style("display","flex")
 			sub.append("span").style("flex-grow",0).text("Last Medal")
 			sub.append("span").style("flex-grow",1).text("Current Count")
@@ -247,12 +260,16 @@
 			.on('mouseout', function(d){ tip("hide",d); })
 			.on("mousemove", function(d) { tip("move"); })
 			enter.append("td").text(function(d){return d.title;})
-			enter.append("td").append("div").attr("class","ick-earned").style("display","flex")
+			enter.append("td").append("div").attr("class","ick-bronze").style("display","flex")
+			enter.append("td").append("div").attr("class","ick-silver").style("display","flex")
+			enter.append("td").append("div").attr("class","ick-gold").style("display","flex")
+			enter.append("td").append("div").text()
+			//enter.append("td").append("div").attr("class","ick-earned").style("display","flex")
 			enter.append("td").append("div").attr("class","ick-progress")
 		
 		//Milestones div
 		var cont = d3.select("#ick-tabMilestones").select(".panel-body")
-			.append("table").attr("class","table table-striped table-hover")
+			.append("table").attr("class","table table-striped table-hover ick-panel")
 		var head = cont.append("thead").append("tr").attr()
 			head.append("th").style("text-align","left").text("Badge Name")
 			head.append("th").style("text-align","left").text("Milestones Reached")
@@ -279,13 +296,13 @@
 
 	function setBadges() {
 		//update earn table (2) update progress table (2)
-		d3.selectAll("tr").filter(function(d){return d && d.next;})
+		d3.selectAll("table.ick-panel").selectAll("tr").filter(function(d){return d && d.next;})
 		.each(function(d) { 
 			updateEarned(d3.select(this),d); 
 			updateProgress(d3.select(this),d,true);
 		})
 		//update progress current (1)
-		d3.selectAll("div").filter(function(d){return d && d.next;})
+		d3.selectAll("div.ick-panel").selectAll("div").filter(function(d){return d && d.next;})
 		.each(function(d) { 
 			updateProgress(d3.select(this),d,false);
 			//update current color
@@ -297,13 +314,16 @@
 		})
 
 		//update shape
-		d3.selectAll("svg").filter(function(d){return d && d.next;})
+		d3.selectAll(".ick-panel").selectAll("svg").filter(function(d){return d && d.next;})
 			.selectAll("use").attr("xlink:href",function(d){ return "#"+d.id; })
+		//update shape
+		d3.selectAll(".ick-panel").selectAll("svg").filter(function(d){return d && d.next;})
+			.selectAll("use.ick-stack").attr("xlink:href",function(d){ return "#stack"; })
 	}
 
 	//update
 	function updateEarned(div,d) {
-		var line=div.select(".ick-earned").html("");
+/*		var line=div.select(".ick-earned").html("");
 		if(d.tier.length==3) {//medal
 			line.append("span").style("flex-grow",1).style("flex-basis",0)
 				.style("text-align","right").style("font-weight","bold")
@@ -330,10 +350,41 @@
 				.append("use").attr("class","ick-g")
 			line.append("span").style("flex-grow",1).style("flex-basis",0)
 		}
+*/
+		var line;
+		if(d.tier.length==3) {//medal
+			line=div.select(".ick-bronze").html("");
+			line.append("span").style("flex-grow",1).style("flex-basis",0)
+				.style("text-align","right").style("font-weight","bold")
+				.attr("class",function(){ return d.count[1]==0 ? "text-muted" : "";})
+				.html("&nbsp;"+d.count[1]+"x"+"&nbsp;")
+			line.append("svg").style("flex-grow",0)
+				.attr("width","25px").attr("height","25px")
+				.append("use").attr("class","ick-b")
+
+			line=div.select(".ick-silver").html("");
+			line.append("span").style("flex-grow",1).style("flex-basis",0)
+				.style("text-align","right").style("font-weight","bold")
+				.attr("class",function(){ return d.count[2]==0 ? "text-muted" : "";})
+				.html("&nbsp;"+d.count[2]+"x"+"&nbsp;")
+			line.append("svg").style("flex-grow",0)
+				.attr("width","25px").attr("height","25px")
+				.append("use").attr("class","ick-s")
+
+			line=div.select(".ick-gold").html("");
+			line.append("span").style("flex-grow",1).style("flex-basis",0)
+				.style("text-align","right").style("font-weight","bold")
+				.attr("class",function(){ return d.count[3]==0 ? "text-muted" : "";})
+				.html("&nbsp;"+d.count[3]+"x"+"&nbsp;")
+			line.append("svg").style("flex-grow",0)
+				.attr("width","25px").attr("height","25px")
+				.append("use").attr("class","ick-g")
+		}
 		else {//milestone
+			line=div.select(".ick-earned").html("");
 			var t=d.currenttier;
-			while(t>10){
-				var stack=line.append("svg")
+			while(t>=10){
+/*				var stack=line.append("svg")
 				.attr("width","50px").attr("height","25px");
 				for(var i=1;i<=10;i++){
 					stack.append("svg")
@@ -341,6 +392,14 @@
 					.attr("transform","translate("+(2*i)+",0)")
 					.append("use").attr("class","ick-"+i)
 				}
+*/
+				var stack=line.append("svg")
+				.attr("width","50px").attr("height","25px");
+				stack.append("use").attr("class","ick-stack")
+					.attr("xlink:href","#stack")
+     			stack.append("g").attr("transform","translate(10,0)")
+        		.append("use").attr("class","ick-10")
+
 				t-=10;
 			}
 			//line.append("span").html("&nbsp;+&nbsp;")
@@ -399,6 +458,7 @@
 		updateProgress(div,d,true);
 
 		div.selectAll("svg").selectAll("use").attr("xlink:href","#"+d.id)
+		div.selectAll("svg").selectAll("use.ick-stack").attr("xlink:href","#stack")
 	}
 
 	//utils
