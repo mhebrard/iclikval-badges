@@ -181,6 +181,20 @@
 		</g>
 	</symbol>
 
+	<symbol id="stack" viewBox="0 0 174 110">
+		<g transform="translate(5,5)" >
+			<path d="M30,0 h40 l30,30 v70 h-100 v-70 l30,-30Z" class="ick-1" transform="translate(0,0)" style="filter:url(#bevel-shadow);"/>
+			<path d="M30,0 h40 l30,30 v70 h-100 v-70 l30,-30Z" class="ick-2" transform="translate(8,0)" style="filter:url(#bevel-shadow);"/>
+			<path d="M30,0 h40 l30,30 v70 h-100 v-70 l30,-30Z" class="ick-3" transform="translate(16,0)" style="filter:url(#bevel-shadow);"/>
+			<path d="M30,0 h40 l30,30 v70 h-100 v-70 l30,-30Z" class="ick-4" transform="translate(24,0)" style="filter:url(#bevel-shadow);"/>
+			<path d="M30,0 h40 l30,30 v70 h-100 v-70 l30,-30Z" class="ick-5" transform="translate(32,0)" style="filter:url(#bevel-shadow);"/>
+			<path d="M30,0 h40 l30,30 v70 h-100 v-70 l30,-30Z" class="ick-6" transform="translate(40,0)" style="filter:url(#bevel-shadow);"/>
+			<path d="M30,0 h40 l30,30 v70 h-100 v-70 l30,-30Z" class="ick-7" transform="translate(48,0)" style="filter:url(#bevel-shadow);"/>
+			<path d="M30,0 h40 l30,30 v70 h-100 v-70 l30,-30Z" class="ick-8" transform="translate(56,0)" style="filter:url(#bevel-shadow);"/>
+			<path d="M30,0 h40 l30,30 v70 h-100 v-70 l30,-30Z" class="ick-9" transform="translate(64,0)" style="filter:url(#bevel-shadow);"/>
+		</g>
+	</symbol>
+
 
 
 </svg>
