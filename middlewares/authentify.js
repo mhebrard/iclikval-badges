@@ -7,8 +7,10 @@ module.exports = function(req, res, next) {
 	//get auth
 	auth=config.keys;
 	//id client
-	var ip = req.headers.origin ? req.headers.origin.replace("http://", "") : req.headers["x-forwarded-host"] ;
-	console.log("Request from",ip);
+	var ip="null";
+	if(req.headers.origin) {ip = req.headers.origin.replace("http://", "");}
+	else if(req.headers["x-forwarded-host"]) {ip = req.headers["x-forwarded-host"];}
+	//console.log("Request from",ip);
 	
 	//verify user
 	if(auth[ip]) { //User exist

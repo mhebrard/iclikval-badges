@@ -1,109 +1,34 @@
 //require
 var fs = require('fs');
 var path = require('path');
-var sql = require('sqlite3').verbose();
 var http = require('http');
 var config = require('../config.json');
-
-//Define Database
-var file = 'rewards.db';
-var exists = fs.existsSync(file);
-var db = new sql.Database(file);
+var badges = require('./badges.json');
 
 //iclikval server
 var url="api.iclikval.riken.jp";
-var badges;
 
-//Init db
-module.exports.init = function() {
-	//if not exist create database
-	db.serialize(function() {
-  		if(!exists) {
-  			//create table
-    		db.run("CREATE TABLE if not exists user ("
-    			+"username TEXT PRIMARY KEY NOT NULL,"
-    			+"hasnewannotation INTEGER"
-    			+")"
-    		);
-    		db.run("CREATE TABLE if not exists reward ("
-    			+"username TEXT,"
-    			+"badgeid TEXT,"
-    			+"count1 INTEGER,"
-    			+"count2 INTEGER,"
-    			+"count3 INTEGER,"
-    			+"highscore INTEGER,"
-    			+"highitem TEXT,"
-    			+"currenttier INTEGER,"
-    			+"currentcount INTEGER,"
-    			+"next INTEGER,"
-    			+"percent INTEGER,"
-    			+"PRIMARY KEY(username,badgeid),"
-    			+"FOREIGN KEY(username) REFERENCES user(username)"
-    			+")"
-    		);
-    		db.each("SELECT name FROM sqlite_master WHERE type='table'", function (err, table) {
-    			console.log("Tables created: "+ table.name);
-   			});
-
-   		}//end if not exist
-	});//end serialize
-
-//	db.close();
-}
-
-module.exports.getBadges = function() {
-	return new Promise(function(ful,rej) {
-		console.log("READ badges");
-		fs.readFile(path.join(__dirname, "badges.json"), function(err, data){
-			if(err) { rej(Error("server.model.getBadges:"+err)); }
-			else {
-				badges=JSON.parse(data);
-				ful(badges);
-			}
-		});
-	});
-}
+module.exports.badges = badges;
 
 module.exports.getRewards = function(user) {
-	return new Promise(function(ful,rej) {
-		selectUser(user)
-		.then(function(u) { return computeRewards(u); })
-		.then(function(u) { return ful(u); })
-		.catch(function(err) { return Error("server.model.getRewards:"+err)})
-	})
+	var rewards=[];
+	var seq = Promise.resolve()
+	.then(function(){ //query
+		console.log("QUERY ANNOT of",user);
+		var p={"group":["reviewer","year","month","day"],"filter":{"reviewer":user}};
+		return query("/annotation-count",p,user,config.token);
+	}).then(function(annots){
+		return computeRewards(annots,rewards)})
+	.then(function() { return rewards; })
+	.catch(function(err) { return Error("server.model.getRewards:"+err)})
+
+	return seq;
 }
 
-function selectUser(user) {
-	return new Promise(function(ful,rej) {
-		console.log("SELECT user",user);
-		//select user
-		db.all("SELECT * FROM user WHERE username='"+user+"'", function(err, u) {
-			if(err) {rej(Error("server.model.selectUser.select:"+err));}
-			if(!u || u.length==0) {// add user to reward db
-				console.log("INSERT",user);
-				u=[{username:user,hasnewannotation:1}];
-				db.run("INSERT INTO user VALUES (?,?)",[user,1],function(err,r) {
-					if(err) {rej(Error("server.model.selectUser.insert:"+err));}
-					ful(u[0]);
-				});
-			}
-			else {ful(u[0]);}	
-		})		
-	})
-}
-
-function computeRewards(u) {
+function computeRewards(annots,rws) {
 	var seq = Promise.resolve();
 	var fc,fh,fk,fd;
-	if (u.hasnewannotation==1) { //update user's badges
-		//get iclikval API token
-		seq = seq.then(function() {
-			console.log("QUERY ANNOT of",u.username);
-			var p={"group":["reviewer","year","month","day"],"filter":{"reviewer":u.username}};
-			return query("/annotation-count",p,u.username,config.token); 
-		})
-		.then(function(data) {
-			return computeWeek(data.result); })
+		seq = seq.then(function() { return computeWeek(annots.result); })
 		.then(function(days) { //Compute day + group by weekend,week,month
 			fc=function(d,b,date){ //is current day ?
 				if(d.group.year==date.getFullYear() 
@@ -112,9 +37,6 @@ function computeRewards(u) {
 					return d.count;
 				}
 				else {return 0;}
-			}
-			fh=function(d) { //high day display
-				return fdate(d.group.year,d.group.month,d.group.day);
 			}
 			fk=function(d) { //key for week
 				return d.group.year+"-"+d.group.week;
@@ -143,7 +65,7 @@ function computeRewards(u) {
 			}
 
 			return Promise.all([
-				computeTier(u.username,days,getBadge("annot-d"),fc,fh), //compute day
+				computeTier(rws,days,"annot-d",fc), //compute day
 				groupBy(days.filter(function(d){return d.group.weekend==1;}),fk,fd), //group by weekend
 				groupBy(days,fk,fd), //group by week
 				groupBy(days,fkm,fdm)//group by month
@@ -158,27 +80,12 @@ function computeRewards(u) {
 				}
 				else {return 0;}
 			}
-			fh=function(d) { //high week display
-				var date = new Date(d.group.year,d.group.month-1,d.group.day);
-				var mon = new Date(d.group.year,d.group.month-1,d.group.day);
-				var sun = new Date(date.setTime( date.getTime() + 6 * 86400000 ));
-				return fdate(mon.getFullYear(),mon.getMonth()+1,mon.getDate())+" to "+fdate(sun.getFullYear(),sun.getMonth()+1,sun.getDate())
-			}
-			var fhwe=function(d) { //high weekend display
-				var date = new Date(d.group.year,d.group.month-1,d.group.day);
-				var sat = new Date(date.setTime( date.getTime() + 5 * 86400000 ));
-				var sun = new Date(date.setTime( date.getTime() + 1 * 86400000 ));
-				return fdate(sat.getFullYear(),sat.getMonth()+1,sat.getDate())+" to "+fdate(sun.getFullYear(),sun.getMonth()+1,sun.getDate())
-			}
 			var fcm=function(d,b,date){ //current month
 				if(d.group.year==date.getFullYear() 
 					&& d.group.month==date.getMonth()+1) {
 					return d.count;
 				}
 				else {return 0;}
-			}
-			var fhm=function(d) { //high month display
-				return fdate(d.group.year,d.group.month);
 			}
 			fk=function(d) { //key for year
 				return d.group.year;
@@ -190,9 +97,9 @@ function computeRewards(u) {
 			}
 
 			return Promise.all([
-				computeTier(u.username,weeks[1],getBadge("annot-we"),fc,fhwe), //compute weekend
-				computeTier(u.username,weeks[2],getBadge("annot-w"),fc,fh), //compute week
-				computeTier(u.username,weeks[3],getBadge("annot-m"),fcm,fhm), //compute month
+				computeTier(rws,weeks[1],"annot-we",fc), //compute weekend
+				computeTier(rws,weeks[2],"annot-w",fc), //compute week
+				computeTier(rws,weeks[3],"annot-m",fcm), //compute month
 				groupBy(weeks[3],fk,fd) //group by year
 			])
 		})
@@ -204,21 +111,16 @@ function computeRewards(u) {
 				}
 				else {return 0;}
 			}
-			fh = function(d) { //high year display
-				return fdate(d.group.year);
-			}
 
-			return computeTier(u.username,years[3],getBadge("annot-y"),fc,fh);
+			var sum=years[3].reduce(function(tot,d) { return tot+d.count;},0);
+
+			return Promise.all([
+				computeTier(rws,years[3],"annot-y",fc), //compute years
+				computeStone(rws,sum,"annot-a") //compute all
+			])
 		})
 		.catch(function(err) { return Error("server.model.computeRewards.years:"+err)})
-	}
 	
-	//Select Rewards
-	seq = seq.then(function(){
-		//	return {test:"STOP",func:"computeRewards",data:years};
-		return selectRewards(u.username);
-	})
-
 	return seq;
 }
 
@@ -253,15 +155,6 @@ function query (entry,p,user,token) {
  	})
  }
  
-/*function getToken() {
-	return new Promise(function(ful,rej) {
-		fs.readFile(path.join(__dirname, "..","middlewares","auth.json"), function(err, data){
-			if(err) { rej(Error("server.model.getToken:"+err)); }
-			else { ful(JSON.parse(data).token);}
-		});
-	});
-}*/
-
 function computeWeek(data) { //return array of days
 	return new Promise(function(ful,rej) {
 		ful(data.map(function(d){ 
@@ -309,47 +202,69 @@ function groupBy(data,fk,fd) {
 	})
 }
 
-function computeTier(user,data,b,fc,fh) {
+function computeTier(rws,data,id,fc) {
 	return new Promise(function(ful,rej) {
-		var sum=0,nb=0,current=0,max={count:-1};//empty day
+		var b = getBadge(id);
+		var current=0,max={count:-1};//empty day
 		var tier0=[],tier1=[],tier2=[],tier3=[];
 		var date=new Date();
 
 		//split by tier + sum + max + currentcount
 		data.forEach(function(d){
-			sum+=d.count;
-			nb+=1;
 			if(d.count>max.count) {max=d;}
-			if(d.count<b.tier1) {tier0.push(d);}
-			else if(d.count<b.tier2) {tier1.push(d);}
-			else if(d.count<b.tier3) {tier2.push(d);}
+			if(d.count<b.tier[0]) {tier0.push(d);}
+			else if(d.count<b.tier[1]) {tier1.push(d);}
+			else if(d.count<b.tier[2]) {tier2.push(d);}
 			else {tier3.push(d);}
 			current+=fc(d,b,date);
 		})
 		//current tier
 		var tier,next;
-		if(current<b.tier1) {tier=0;next=b.tier1;}
-		else if(current<b.tier2) {tier=1;next=b.tier2;}
-		else if(current<b.tier3) {tier=2;next=b.tier3;}
-		else {tier=3;next=current;}
+		if(current<b.tier[0]) {tier=0;next=b.tier[0];}
+		else if(current<b.tier[1]) {tier='b';next=b.tier[1];}
+		else if(current<b.tier[2]) {tier='s';next=b.tier[2];}
+		else {tier='g';next=current;}
 		//insert
-		var insert = [user,b.id,tier1.length,tier2.length,tier3.length,max.count,fh(max),tier,current,next,Math.round(current*100/next)];
-		console.log("INSERT badge [",user,b.id,"... ]");
-		db.run("INSERT OR REPLACE INTO reward VALUES (?,?,?,?,?,?,?,?,?,?,?)",insert,function(err,r){
-			if(err) {rej(Error("server.model.computeTier:"+err));}
-			ful("Reward INSERTED");
+		rws.push({
+			badgeid:b.id, 
+			count:[tier0.length,tier1.length,tier2.length,tier3.length],
+			currenttier:tier,
+			currentcount:current,
+			next:next,
+			percent:Math.round(current*100/next)
 		});
-	})
+		console.log("push reward",b.id);
+		ful(max.count);
+	}).then(function(mcount){ return computeStone(rws,mcount,id); })
 }
 
-function selectRewards(user){
+function computeStone(rws,sum,id) {
 	return new Promise(function(ful,rej) {
-		console.log("SELECT rewards of",user);
-		//select user
-		db.all("SELECT * FROM reward WHERE username='"+user+"'", function(err, r) {
-			if(err) {rej(Error("server.model.selectRewards:"+err));}
-			ful(r);
-		})		
+		var b = getBadge(id+"s");
+		//current tier
+		var tier,next;
+		var found=false;
+		for(var i=0;i<b.tier.length && !found;i++){
+			if(sum<b.tier[i]) {
+				tier=i;
+				next=b.tier[i];
+				found=true;
+			}
+		}
+		//maximum tier
+		if(!found) {tier=b.tier.length;next=sum;}
+
+		//insert
+		rws.push({
+			badgeid:b.id, 
+			count:[],
+			currenttier:tier,
+			currentcount:sum,
+			next:next,
+			percent:Math.round(sum*100/next)
+		});
+		console.log("push reward",b.id);
+		ful("Reward INSERTED");
 	})
 }
 
