@@ -10,36 +10,36 @@
 		param.server=server;
 		param.key=key;
 		param.user=user;
-		var scripts = [];
+		var queue = [];
 		//verif dependencies
-		if (!window.jQuery) { //include jQ + bootstrap
-			scripts.push(scriptload("http://code.jquery.com/jquery-1.12.0.min.js")); 
-			scripts.push(linkload("https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css"));
-			scripts.push(linkload("https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap-theme.min.css"));
-			scripts.push(scriptload("https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"));
-		}
-		else if (!$.fn.modal.Constructor.VERSION) { //include bootstrap
-			scripts.push(linkload("https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css"));
-			scripts.push(linkload("https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap-theme.min.css"));
-			scripts.push(scriptload("https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js")); 
-		}
-		if(!window.d3) {scripts.push(scriptload("http://d3js.org/d3.v3.min.js")); } //include d3
-
-		Promise.resolve()
-		.then(function(){ return Promise.all(scripts);}) //run loading
-		.catch(function(err){return console.log("ERR(ick.load.a):"+err);})
+		Promise.resolve().then(function(){
+			if (!window.jQuery) { //no jQuery
+				return scriptload("http://code.jquery.com/jquery-1.12.0.min.js");
+			}
+			else { return Promise.resolve() }
+		}).catch(function(err){setError(err,"danger","ick.load.jQuery: jQuery is in trouble");})
+		.then(function(){ //incude Bootstrap + D3
+			if(!$.fn.modal || !$.fn.modal.Constructor.VERSION) {
+				queue.push(linkload("https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css"));
+				queue.push(scriptload("https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js")); 
+			}
+			if(!window.d3) {queue.push(scriptload("https://d3js.org/d3.v3.min.js")); } //include d3
+			return Promise.all(queue);
+		}).catch(function(err){setError(err,"danger","ick.load.bootstrap: bootstrap is in trouble");})
 		.then(function(){ 
 			//console.log("iclikval",ick.version);
 			//console.log("jQ",jQuery.fn.jquery);
 			//console.log("bootstrap",$.fn.modal.Constructor.VERSION);
 			//console.log("d3",d3.version);
 			return Promise.all([initView(),getBadges(),getSvg()]);
-		}).then(function(){ 
+		}).catch(function(err){setError(err,"danger","ick.load.getBadges: cannot get Badges data");})
+		.then(function(){ 
 			return Promise.all([setView(),getRewards()]);
-		}).then(function(){
+		}).catch(function(err){setError(err,"warning","ick.load.getRewards: cannot get Rewards data");})
+		.then(function(){
 			console.log("setBadges",badges);
 		 	setBadges(); 
-		}).catch(function(err) { setError(err); return Error("ick.load:",err); })
+		}).catch(function(err) { setError(err,"warning","ick.load.setBadges: cannot display Badges info");})
 	}
 
 	function scriptload(u) {
@@ -69,7 +69,7 @@
 			d3.json(param.server+"/get/badges/")
 				.header("Content-Type", "application/json")
 				.post(JSON.stringify({key:param.key,user:param.user}),function(err, data) {
-					if(err){ rej(Error("Unable to get badges:",err)) }
+					if(err){ rej(new Error("Unable to get badges:",err)) }
 					else {
 						badges=data;
 						console.log("getBadges",badges);
@@ -84,14 +84,15 @@
 			d3.text(param.server+"/get/glyphs/")
 				.header("Content-Type", "application/json")
 				.post(JSON.stringify({key:param.key,user:param.user}),function(err, data) {
-					if(err){ rej(Error("Unable to get glyphs:",err)) }
+					if(err){ rej(new Error("Unable to get glyphs:",err)) }
 					else {
 						//hidden div
-						d3.select("body").selectAll(".ick-hide").data(["glyphs"])
-						.enter().append("div")//.style("display","none")
+						d3.select("body").selectAll(".ick-hide").data(["glyphs","tip"])
+						.enter().append("div")
 						.attr("id",function(d){return "ick-"+d;}).attr("class", "ick-hide");
 
 						d3.select("#ick-glyphs").html(data)
+						d3.select("#ick-tip").style("opacity",0)
 						ful("Glyphs OK");
 					}
 				})
@@ -103,7 +104,7 @@
 			d3.json(param.server+"/get/rewards/")
 				.header("Content-Type", "application/json")
 				.post(JSON.stringify({key:param.key,user:param.user}),function(err, data) {
-					if(err){ rej(Error("Unable to get rewards:",err)) }
+					if(err){ rej(new Error("Unable to get rewards:",err)) }
 					else {
 						console.log("getRewards",data);
 						//merge rewards and badges
@@ -130,11 +131,10 @@
 		.enter().append("style").attr("id","ick-css").text(
 			"#ick-main .progress{position:relative; margin-bottom:0px;}\n"
 			+"#ick-main .progress span{position:absolute;display:block;width:100%;color:black;}\n"
+			+"#ick-tip{position:absolute;z-index:3;color:#fff;background-color:#000;border:1px solid #000;border-radius:.2em;padding:3px;white-space:nowrap;font-size:14px;pointer-events:none;opacity:0}\n"
+						
 		)
-		//hidden div
-		//d3.select("body").selectAll(".ick-hide").data(["tip"])
-		//.enter().append("div").attr("id",function(d){return "ick-"+d;}).attr("class", "ick-hide");
-
+		
 		//main
 		var div = d3.select(".ick-content").attr("id","ick-main")
 		var nav = div.append("div").attr("class","clearfix").append("div").attr("class","ick-nav btn-group pull-right")
@@ -212,9 +212,11 @@
 			.attr("class",function(d){return "ick-b"+d.id;})
 			.style("text-align","center").style("padding","10px 5px")
 			.style("cursor","pointer")
-			.on("click",function(d){ $(this).tooltip('hide'); updateModal(d);})
 			.attr("data-toggle","modal").attr("data-target","#ick-info")
-			.attr("title",function(d) {return d.legend;})
+			.on("click",function(d){tip("hide",d); updateModal(d);})
+			.on('mouseover', function(d){ tip("show",d); })
+			.on('mouseout', function(d){ tip("hide",d); })
+			.on("mousemove", function(d) { tip("move"); })
 		enter.append("svg").attr("width","80px").attr("height","80px")
 			.attr("class","ick-current")
 			.append("use").attr("class","ick-glyph")
@@ -234,16 +236,16 @@
 			sub.append("span").style("flex-grow",0).text("Last Medal")
 			sub.append("span").style("flex-grow",1).text("Current Count")
 			sub.append("span").style("flex-grow",0).text("Next Medal")
-			//head.append("th").style("text-align","center").text("Current Count")
-			//head.append("th").style("text-align","right").text("Next Medal")
 		var body = cont.append("tbody").selectAll("tr")
 			.data(badges.filter(function(d){return d.tier.length==3;}))
 		var enter = body.enter().append("tr")
 			.attr("class",function(d){return "ick-b"+d.id;})
 			.style("cursor","pointer")
-			.on("click",function(d){$(this).tooltip('hide'); updateModal(d);})
 			.attr("data-toggle","modal").attr("data-target","#ick-info")
-			.attr("title",function(d) {return d.legend;})
+			.on("click",function(d){tip("hide",d); updateModal(d);})
+			.on('mouseover', function(d){ tip("show",d); })
+			.on('mouseout', function(d){ tip("hide",d); })
+			.on("mousemove", function(d) { tip("move"); })
 			enter.append("td").text(function(d){return d.title;})
 			enter.append("td").append("div").attr("class","ick-earned").style("display","flex")
 			enter.append("td").append("div").attr("class","ick-progress")
@@ -258,21 +260,19 @@
 			sub.append("span").style("flex-grow",0).text("Last Milestone")
 			sub.append("span").style("flex-grow",1).text("Current Count")
 			sub.append("span").style("flex-grow",0).text("Next Milestone")
-			//head.append("th").style("text-align","left").text("Current Count")
-			//head.append("th").style("text-align","right").text("Next Stone")
 		var body = cont.append("tbody").selectAll("tr")
 			.data(badges.filter(function(d){return d.tier.length>3;}))
 		var enter = body.enter().append("tr")
 			.attr("class",function(d){return "ick-b"+d.id;})
 			.style("cursor","pointer")
-			.on("click",function(d){$(this).tooltip('hide'); updateModal(d);})
 			.attr("data-toggle","modal").attr("data-target","#ick-info")
-			.attr("title",function(d) {return d.legend;})
+			.on("click",function(d){tip("hide",d); updateModal(d);})
+			.on('mouseover', function(d){ tip("show",d); })
+			.on('mouseout', function(d){ tip("hide",d); })
+			.on("mousemove", function(d) { tip("move"); })
 			enter.append("td").text(function(d){return d.title;})
 			enter.append("td").attr("class","ick-earned")
 			enter.append("td").attr("colspan",2).append("div").attr("class","ick-progress")
-
-		$(function() { $('[data-toggle="modal"]').tooltip(); });
 		
 		return Promise.resolve();
 	}
@@ -408,6 +408,23 @@
 			if(badges[i].id==id) {obj=badges[i];}
 		}
 		return obj;
+	}
+
+	function tip(state,d) {
+		console.log("tip",state);
+		if(state=="show") {
+			d3.select("#ick-tip")
+				.datum(d)
+				.style("opacity",1)
+				.text(function(d) { return d.legend; })
+		}
+		else if(state=="hide") {
+			d3.select("#ick-tip").style("opacity",0)
+		}
+		else { // move
+			d3.select("#ick-tip").style("top", (d3.event.pageY+10)+"px")
+            .style("left", (d3.event.pageX+10)+"px")
+		}
 	}
 
 	function setError(e) {
