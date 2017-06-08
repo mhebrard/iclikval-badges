@@ -1,9 +1,9 @@
 !(function() {
-	
+
 	var ick = { version: "1.2.1" };
 	var param = {};
 	var badges;
-		
+
 	//METHODS//
 	//Load//
 	ick.load = function(server,key,user) {
@@ -21,24 +21,24 @@
 		.then(function(){ //incude Bootstrap + D3
 			if(!$.fn.modal || !$.fn.modal.Constructor.VERSION) {
 				queue.push(linkload("https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css"));
-				queue.push(scriptload("https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js")); 
+				queue.push(scriptload("https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"));
 			}
 			if(!window.d3) {queue.push(scriptload("https://d3js.org/d3.v3.min.js")); } //include d3
 			return Promise.all(queue);
 		}).catch(function(err){setError(err,"danger","ick.load.bootstrap: bootstrap is in trouble");})
-		.then(function(){ 
+		.then(function(){
 			//console.log("iclikval",ick.version);
 			//console.log("jQ",jQuery.fn.jquery);
 			//console.log("bootstrap",$.fn.modal.Constructor.VERSION);
 			//console.log("d3",d3.version);
 			return Promise.all([initView(),getBadges(),getSvg()]);
 		}).catch(function(err){setError(err,"danger","ick.load.getBadges: cannot get Badges data");})
-		.then(function(){ 
+		.then(function(){
 			return Promise.all([setView(),getRewards()]);
 		}).catch(function(err){setError(err,"warning","ick.load.getRewards: cannot get Rewards data");})
 		.then(function(){
 			console.log("setBadges",badges);
-		 	setBadges(); 
+		 	setBadges();
 		}).catch(function(err) { setError(err,"warning","ick.load.setBadges: cannot display Badges info");})
 	}
 
@@ -97,7 +97,7 @@
 					}
 				})
 		})
-	}					
+	}
 
 	function getRewards() {
 		return new Promise(function(ful,rej) {
@@ -132,9 +132,9 @@
 			"#ick-main .progress{position:relative; margin-bottom:0px;}\n"
 			+"#ick-main .progress span{position:absolute;display:block;width:100%;color:black;}\n"
 			+"#ick-tip{position:absolute;z-index:3;color:#fff;background-color:#000;border:1px solid #000;border-radius:.2em;padding:3px;white-space:nowrap;font-size:14px;pointer-events:none;opacity:0}\n"
-						
+
 		)
-		
+
 		//main
 		var div = d3.select(".ick-content").attr("id","ick-main")
 		var nav = div.append("div").attr("class","clearfix").append("div").attr("class","ick-nav btn-group pull-right")
@@ -145,7 +145,7 @@
 			.attr("href",function(d){ return "#ick-tab"+d; })
 			.text(function(d){ return d; })
 		var panes = div.append("div")
-		
+
 		//Current div
 		var pan = panes.append("div").attr("id","ick-tabCurrent").attr("class","panel panel-default")
 			pan.append("div").attr("class","panel-heading").text("Current Badge Collection")
@@ -186,7 +186,7 @@
 		line.append("span").attr("class","ick-bronze")
 		line.append("span").attr("class","ick-silver")
 		line.append("span").attr("class","ick-gold")
-		
+
 		line = sub.append("div")
 		line.append("label").html("Current Count:&nbsp")
 		line.append("span").attr("class","ick-current")
@@ -194,7 +194,7 @@
 		line.append("span").attr("class","ick-next")
 
 		line = sub.append("div").attr("class","ick-progress")
-		
+
 		//modif scroll according to iclikval top menu
 		var offset = 50;
 		$('.ick-nav a').click(function(event) {
@@ -205,7 +205,7 @@
 	}
 
 	function setView() {
-		console.log("setView");		
+		console.log("setView");
 		//Current div
 		var cont = d3.select("#ick-tabCurrent").select(".panel-body")
 			.append("div").attr("class","ick-panel")
@@ -228,7 +228,7 @@
 		enter.append("div").attr("class","ick-progress")
 		enter.append("div").style("font-weight","bold").style("text-align","center")
 			.style("width","80px").text(function(d){return d.title;})
-		
+
 		//Medal div
 		var cont = d3.select("#ick-tabMedals").select(".panel-body")
 			.append("table").attr("class","table table-striped table-hover ick-panel")
@@ -266,7 +266,7 @@
 			enter.append("td").append("div").text()
 			//enter.append("td").append("div").attr("class","ick-earned").style("display","flex")
 			enter.append("td").append("div").attr("class","ick-progress")
-		
+
 		//Milestones div
 		var cont = d3.select("#ick-tabMilestones").select(".panel-body")
 			.append("table").attr("class","table table-striped table-hover ick-panel")
@@ -290,20 +290,20 @@
 			enter.append("td").text(function(d){return d.title;})
 			enter.append("td").attr("class","ick-earned")
 			enter.append("td").attr("colspan",2).append("div").attr("class","ick-progress")
-		
+
 		return Promise.resolve();
 	}
 
 	function setBadges() {
 		//update earn table (2) update progress table (2)
 		d3.selectAll("table.ick-panel").selectAll("tr").filter(function(d){return d && d.next;})
-		.each(function(d) { 
-			updateEarned(d3.select(this),d); 
+		.each(function(d) {
+			updateEarned(d3.select(this),d);
 			updateProgress(d3.select(this),d,true);
 		})
 		//update progress current (1)
 		d3.selectAll("div.ick-panel").selectAll("div").filter(function(d){return d && d.next;})
-		.each(function(d) { 
+		.each(function(d) {
 			updateProgress(d3.select(this),d,false);
 			//update current color
 			d3.select(this).select("use").attr("class",function(){
@@ -332,7 +332,7 @@
 			line.append("svg").style("flex-grow",0)
 				.attr("width","25px").attr("height","25px")
 				.append("use").attr("class","ick-b")
-			
+
 			line.append("span").style("flex-grow",1).style("flex-basis",0)
 				.style("text-align","right").style("font-weight","bold")
 				.attr("class",function(){ return d.count[2]==0 ? "text-muted" : "";})
@@ -422,7 +422,7 @@
 				return "ick-"+t;
 			})
 		}
-		
+
 		line.append("div").attr("class","progress").style("width","100%")
 			.append("div").attr("class","progress-bar progress-bar-info")
 			.attr("aria-valuemin",0).attr("aria-valuemax",d.next).attr("aria-valuenow",f(d.currentcount))
@@ -438,7 +438,7 @@
 				else if(t=="b") {t="s";}
 				else if(t=="s") {t="g";}
 				else if(t=="g") {t="g";}
-				else { 
+				else {
 					while(t>10){t-=10;}
 					t++;
 				}
@@ -471,7 +471,7 @@
 	}
 
 	function tip(state,d) {
-		console.log("tip",state);
+		// console.log("tip",state);
 		if(state=="show") {
 			d3.select("#ick-tip")
 				.datum(d)
@@ -500,5 +500,5 @@
 	//DEFINE OR EXPORTS//
 	if (typeof define === "function" && define.amd) define(ick); else if (typeof module === "object" && module.exports) module.exports = ick;
 	this.ick = ick;
-	
+
 }());

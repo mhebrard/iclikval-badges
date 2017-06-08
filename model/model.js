@@ -1,7 +1,7 @@
 //require
 var fs = require('fs');
 var path = require('path');
-var http = require('http');
+var http = require('https');
 var config = require('../config.json');
 var badges = require('./badges.json');
 
@@ -16,7 +16,7 @@ module.exports.getRewards = function(user) {
 	.then(function(){ //query
 		console.log("QUERY ANNOT of",user);
 		var p={"group":["reviewer","year","month","day"],"filter":{"reviewer":user}};
-		return query("/annotation-count",p,user,config.token);
+		return query("/annotation-count",p,user);
 	}).then(function(annots){
 		return computeRewards(annots,rewards)})
 	.then(function() { return rewards; })
@@ -31,8 +31,8 @@ function computeRewards(annots,rws) {
 		seq = seq.then(function() { return computeWeek(annots.result); })
 		.then(function(days) { //Compute day + group by weekend,week,month
 			fc=function(d,b,date){ //is current day ?
-				if(d.group.year==date.getFullYear() 
-					&& d.group.month==date.getMonth()+1 
+				if(d.group.year==date.getFullYear()
+					&& d.group.month==date.getMonth()+1
 					&& d.group.day==date.getDate()) {
 					return d.count;
 				}
@@ -40,7 +40,7 @@ function computeRewards(annots,rws) {
 			}
 			fk=function(d) { //key for week
 				return d.group.year+"-"+d.group.week;
-			} 
+			}
 			fd=function(d) { //week node
 				var date = new Date(d.group.year,d.group.month-1,d.group.day);
 				var n = JSON.parse(JSON.stringify(d));
@@ -50,7 +50,7 @@ function computeRewards(annots,rws) {
 				n.group.day = mon.getDate();
 				n.group.month = mon.getMonth()+1;
 				n.group.year = mon.getFullYear();
-				//delete n.group.week; 
+				//delete n.group.week;
 				delete n.group.weekend;
 				return n;
 			}
@@ -74,14 +74,14 @@ function computeRewards(annots,rws) {
 		.catch(function(err) { return Error("server.model.computeRewards.days:"+err)})
 		.then(function(weeks) { //Compute weekend,week,month + group by year
 			fc=function(d,b,date){ //current week
-				if(d.group.year==date.getFullYear() 
+				if(d.group.year==date.getFullYear()
 					&& d.group.week==getWeek(date)) {
 					return d.count;
 				}
 				else {return 0;}
 			}
 			var fcm=function(d,b,date){ //current month
-				if(d.group.year==date.getFullYear() 
+				if(d.group.year==date.getFullYear()
 					&& d.group.month==date.getMonth()+1) {
 					return d.count;
 				}
@@ -120,26 +120,25 @@ function computeRewards(annots,rws) {
 			])
 		})
 		.catch(function(err) { return Error("server.model.computeRewards.years:"+err)})
-	
+
 	return seq;
 }
 
-function query (entry,p,user,token) {
+function query (entry,p,user) {
  	return new Promise(function(ful,rej) {
 		var data = JSON.stringify(p);
 		var options = {
-	    	host: url,
-	   		port: 80,
+	    	hostname: url,
 	    	path: entry,
 	    	method: 'POST',
 	   		headers: {
-		   		'Authorization': 'Bearer '+token,
-		        'Content-Type': 'application/json',
-		        'Accept': 'application/json',
-		        'Content-Length': Buffer.byteLength(data)
+		   		'Content-Type': 'application/json',
+		      'Accept': 'application/json',
+		      'Content-Length': Buffer.byteLength(data)
 		    }
 		};
 		var req = http.request(options, function(res) {
+			// console.log('query', res);
 			var body="";
 		  	res.setEncoding('utf8');
 		  	res.on('data', function (chunk) { body+=chunk; });
@@ -154,10 +153,10 @@ function query (entry,p,user,token) {
 		req.end();
  	})
  }
- 
+
 function computeWeek(data) { //return array of days
 	return new Promise(function(ful,rej) {
-		ful(data.map(function(d){ 
+		ful(data.map(function(d){
 			var date = new Date(d.group.year,d.group.month-1,d.group.day);
 			//manages days before week 1
 			var w = getWeek(date);
@@ -226,7 +225,7 @@ function computeTier(rws,data,id,fc) {
 		else {tier='g';next=current;}
 		//insert
 		rws.push({
-			badgeid:b.id, 
+			badgeid:b.id,
 			count:[tier0.length,tier1.length,tier2.length,tier3.length],
 			currenttier:tier,
 			currentcount:current,
@@ -256,7 +255,7 @@ function computeStone(rws,sum,id) {
 
 		//insert
 		rws.push({
-			badgeid:b.id, 
+			badgeid:b.id,
 			count:[],
 			currenttier:tier,
 			currentcount:sum,
