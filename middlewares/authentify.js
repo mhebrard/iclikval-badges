@@ -7,11 +7,11 @@ module.exports = function(req, res, next) {
 	//get auth
 	auth=config.keys;
 	//id client
-	if(req.headers.origin) {ip = req.headers.origin.replace("http://", "");}
-	else {ip = ip = req.headers.host.replace("http://", "");}
+	if(req.headers.origin) {ip = req.headers.origin.replace("https://", "");}
+	else {ip = req.headers.host.replace("https://", "");}
 	//console.log("Request from",ip);
 	//console.log("header:",req.headers);
-	
+
 	//verify user
 	if(auth[ip]) { //User exist
 		if(req.body.key) { // Key exist
@@ -45,4 +45,3 @@ module.exports = function(req, res, next) {
         return;
 	}
 }
-
